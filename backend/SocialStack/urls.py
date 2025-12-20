@@ -1,0 +1,45 @@
+"""
+URL configuration for SocialStack project.
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/6.0/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.urls import path, include, get_resolver
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.http import HttpResponse
+from django.views.generic import TemplateView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+def show_urls(request):
+    resolver = get_resolver()
+    urls = []
+    for pattern in resolver.url_patterns:
+        urls.append(str(pattern))
+    return HttpResponse('<br>'.join(urls))
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('debug-urls/', show_urls),
+    path("auth/login/", TokenObtainPairView.as_view()),
+    path("auth/refresh/", TokenRefreshView.as_view()),
+    path("accounts/", include("accounts.urls")),
+    path("social/", include("social.urls")),
+    path('', TemplateView.as_view(template_name='index.html')),
+
+]
+
+# This serves media files in development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

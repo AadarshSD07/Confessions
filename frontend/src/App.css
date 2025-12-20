@@ -1,0 +1,148 @@
+#root {
+  /* max-width: 1280px; */
+  margin: 0 auto;
+  /* padding: 2rem; */
+  /* text-align: center; */
+  min-height: 42rem;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+.page-content {
+  padding: 2rem;
+  margin: 1rem;
+  place-items: center;
+}
+
+.app-grid {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  /* height: 86vh; */
+  overflow: hidden;
+}
+
+.grey-background {
+  background-color: #ebeef1;
+}
+
+.sidebars {
+  min-height: 25rem;
+  max-height: 25rem;
+  min-width: 18rem;
+  padding: 2rem;
+  margin: 1rem;
+  font-size: larger;
+}
+
+.user-profile-image {
+  height: 3rem;
+  width: 3rem;
+}
+
+.post-container {
+    max-width: 60rem;
+    margin: auto;
+    border: 1px solid #ffffff;
+    border-radius: 16px;
+    background-color: #ffffff;
+}
+
+.post-header {
+    padding: 16px 16px 0 16px;
+    /* padding: 16px; */
+    border-bottom: 1px solid #ffffff;
+}
+
+.post-body {
+    /* padding: 16px; */
+    padding: 0 16px 16px 16px;
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.username {
+    color: #8b98a5;
+    font-size: 0.95rem;
+}
+
+.post-text {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 12px 0;
+}
+
+.timestamp {
+    color: #8b98a5;
+    font-size: 0.95rem;
+}
+
+.stats {
+    display: flex;
+    gap: 20px;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #8b98a5;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.stat-icon {
+    font-size: 1.2rem;
+}
+
+.success-toast {
+  background-color: rgb(208, 255, 208);
+  color: rgb(0, 78, 0);
+}
+
+.svgButton {
+    color: black;
+    background-color: transparent;
+  }
+
+.svgButton:hover {
+  border-color: transparent;
+}
