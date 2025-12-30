@@ -9,7 +9,7 @@ class User(AbstractUser):
     pass
 
     def get_user_role(self):
-        user_role = UserRole.objects.filter(user = self.id)
+        user_role = UserRole.objects.filter(user=self)
         if user_role.exists():
             return user_role.first().role.role
         else:

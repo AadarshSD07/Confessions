@@ -43,8 +43,8 @@
 }
 
 .page-content {
-  padding: 2rem;
-  margin: 1rem;
+  /* padding: 2rem;
+  margin: 1rem; */
   place-items: center;
 }
 
@@ -74,7 +74,7 @@
 }
 
 .post-container {
-    max-width: 60rem;
+    /* max-width: 60rem; */
     margin: auto;
     border: 1px solid #ffffff;
     border-radius: 16px;

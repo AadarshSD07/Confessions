@@ -1,6 +1,5 @@
 import { useState } from "react";
 import axios from "axios";
-import Header from "../Components/Headers";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -34,8 +33,8 @@ const Login = () => {
 
   return (
     <>
-    <Header cornerButton={"Login"}/>
-    <div className='container-md py-5 w-25'>
+    <h1 className="text-center pt-4">Login</h1>
+    <div className='container-md py-3 w-25'>
       <form onSubmit={handleSubmit}>
         {error && (
           <div className="alert alert-danger" role="alert">
@@ -43,13 +42,13 @@ const Login = () => {
           </div>
         )}
         
-        <div className="form-group">
+        <div className="form-group mt-2">
           <label htmlFor="username">Username</label>
           <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="form-control"
           placeholder="Username" id="username" minLength="3" maxLength="150" disabled={loading} required />
         </div>
         
-        <div className="form-group">
+        <div className="form-group mt-2">
           <label htmlFor="password">Password</label>
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="form-control" 
             placeholder="Password" id="password" minLength="8" disabled={loading} required />
@@ -57,7 +56,7 @@ const Login = () => {
           <small className="form-text text-muted">Password must be at least 8 characters long.</small>
         </div>
         
-        <button type="submit" className="btn btn-primary" disabled={loading}>
+        <button type="submit" className="btn btn-primary mt-2" disabled={loading}>
           {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>

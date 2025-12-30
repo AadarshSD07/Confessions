@@ -1,10 +1,13 @@
+from accounts.models import UserProfile
+from django.db.models.functions import Cast
+from django.db.models import CharField
 from rest_framework import status
-from rest_framework_simplejwt.authentication import JWTAuthentication  # Import this
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
-from accounts.models import UserProfile
 from social.models import UserPost
+
 import json
 
 class FetchSocialPosts(APIView):
@@ -13,10 +16,15 @@ class FetchSocialPosts(APIView):
     queryset = UserPost.objects.all()
 
     def get(self, request, format=None):
-        total_posts = list(self.queryset.values("id","imageurl", "user__username", "user__userprofile__image", "user__first_name", "user__last_name", "imageurl", "post_desc"))
-        user_role = request.user.get_user_role()
+        total_posts = list(
+            self.queryset.annotate(
+                updated_at_str=Cast('updated_at', CharField())
+            ).values(
+                "id", "imageurl", "user__username", "user__userprofile__image", "user__first_name", "user__last_name", "imageurl", "post_desc", "updated_at_str"
+            ))
+        is_user_admin = request.user.get_user_role() == "admin"
         posts = json.dumps(total_posts)
-        response = {"socialPosts": posts, "userRole":user_role}
+        response = {"socialPosts": posts, "isUserAdmin":is_user_admin}
         return Response(response, status=status.HTTP_200_OK)
     
     def delete(self, request):
@@ -38,11 +46,15 @@ class FetchUserPosts(APIView):
     queryset = UserPost.objects.all()
 
     def get(self, request, format=None):
-        total_posts = list(self.queryset.filter(user = request.user).values("id","imageurl", "user__username", "user__userprofile__image", "user__first_name", "user__last_name", "imageurl", "post_desc"))
-        mapped_user_images = {item["user"]: item["image"] for item in UserProfile.objects.filter(user = request.user).values("user", "image")}
+        total_posts = list(
+            self.queryset.filter(user = request.user)
+            .annotate(
+                updated_at_str=Cast('updated_at', CharField())
+            ).values(
+                "id", "imageurl", "user__username", "user__userprofile__image", "user__first_name", "user__last_name", "imageurl", "post_desc", "updated_at_str"
+            ))
         posts = json.dumps(total_posts)
-        userprofile = json.dumps(mapped_user_images)
-        response = {"socialPosts": posts, "userProfile": userprofile}
+        response = {"socialPosts": posts}
         return Response(response, status=status.HTTP_200_OK)
     
     def post(self, request):

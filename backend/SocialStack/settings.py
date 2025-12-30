@@ -154,3 +154,8 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
+
+TIME_ZONE = 'Asia/Kolkata'  # IST (UTC+5:30)
+USE_TZ = True               # Enable timezone support
+
+# SQLite stores UTC internally, Django converts to IST automatically

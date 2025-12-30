@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react'
+import getTimeAgo from '../Methods/TimestampCalculation';
 import axios from "axios";
 import "../App.css"
 
@@ -62,18 +63,10 @@ export default function Dashboard() {
   if (error) return <div>Error: {error}</div>;
 
   const socialPosts = JSON.parse(getPostsData.socialPosts)
-  let styles = {
-    minWidth: "60rem"
-  }
+
   return (
     <>
-    <p className="text-secondary" style={styles}>Dashboard</p>
-    <div className="mb-4" style={styles}>
-      <h6>Welcome, John (Admin)</h6>
-    </div>
-    <div style={styles}>
-      <h3 className='fs-3'>All Posts</h3>
-    </div>
+    <h3 className='fs-3'>Self Posts</h3>
     <div className="container">
       { socialPosts.length < 1 ? (
         "No Posts To Display"
@@ -109,8 +102,7 @@ export default function Dashboard() {
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-pin-angle-fill" viewBox="0 0 16 16">
                     <path d="M9.828.722a.5.5 0 0 1 .354.146l4.95 4.95a.5.5 0 0 1 0 .707c-.48.48-1.072.588-1.503.588-.177 0-.335-.018-.46-.039l-3.134 3.134a6 6 0 0 1 .16 1.013c.046.702-.032 1.687-.72 2.375a.5.5 0 0 1-.707 0l-2.829-2.828-3.182 3.182c-.195.195-1.219.902-1.414.707s.512-1.22.707-1.414l3.182-3.182-2.828-2.829a.5.5 0 0 1 0-.707c.688-.688 1.673-.767 2.375-.72a6 6 0 0 1 1.013.16l3.134-3.133a3 3 0 0 1-.04-.461c0-.43.108-1.022.589-1.503a.5.5 0 0 1 .353-.146"/>
                   </svg>
-                  {/* &nbsp; {post.time} */}
-                  &nbsp; hour ago
+                  &nbsp; {getTimeAgo(post.updated_at_str)}
                 </div>
               </div>
             </div>
