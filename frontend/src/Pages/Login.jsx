@@ -1,4 +1,5 @@
 import { useState } from "react";
+import LocalStorageVariables from "../Methods/LocalStorageVariables";
 import axios from "axios";
 
 const Login = () => {
@@ -7,6 +8,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -14,7 +16,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/auth/login/",
+        `${backendUrl}/auth/login/`,
         {
           username: username,
           password: password,

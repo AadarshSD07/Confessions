@@ -1,69 +1,101 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import LocalStorageVariables from "../Methods/LocalStorageVariables";
+import axios from "axios";
 
 export default function Profile() {
     const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [npassword, setNPassword] = useState("");
+    const [firstname, setFirstname] = useState("");
+    const [lastname, setLastname] = useState("");
+    const [imageUrl, setImageUrl] = useState("");
+
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    useEffect(() => {
+        const fetchUserDetails = async () => {
+            const config = LocalStorageVariables("config");
+            try {
+                const response = await axios.get(
+                    `${backendUrl}/accounts/user-details/`,
+                    config
+                );
+                if (response.status === 200){
+                    setUsername(response.data["username"]);
+                    setFirstname(response.data["firstName"]);
+                    setLastname(response.data["lastName"]);
+                    setImageUrl(response.data["imageUrl"]);
+                } else {
+                    alert("Status " + response.status.toString() + ": " + response.statusText.toString());
+                }
+            } catch (err) {
+                alert(err);
+                console.log("Error with request");
+            }
+        }
+        fetchUserDetails();
+    });
 
     const Submit = async (e) => {
         e.preventDefault();
-        const access = localStorage.getItem("access");
-        const config = {
-        headers: {
-        'Authorization': `Bearer ${access}`,
-        'Content-Type': 'application/json'
-        }
-        };
+        const config = LocalStorageVariables("config");
         try {
-        const response = await axios.post(
-            "http://127.0.0.1:8000/accounts/update-password/",
+            const response = await axios.post(
+                `${backendUrl}/accounts/user-details/`,
             {
                 username: username,
-                password: password,
-                npassword: npassword
+                firstname: firstname,
+                lastname: lastname
             },
             config
-        );
-        if (response.status === 200){
-            setUsername("");
-            setPassword("");
-            window.location.href = "/";
-        }
+            );
+            if (response.status === 200){
+                window.location.href = "/";
+            }
 
         } catch (err) {
-        alert(err);
-        console.log("Error with request");
+            alert(err);
+            console.log("Error with request");
         }
     }
-
     return (
         <>
-        <div className="w-25">
+        <div className="w-25 container">
             <form onSubmit={Submit}>
-            <div className="mb-3">
-                <label htmlFor="username" className="form-label">
-                Username
-                </label>
-                <input id="username" value={username} onChange={(e) => setUsername(e.target.value)} className="form-control shadow-sm" 
-                placeholder="username" />
-            </div>
-            <div className="mb-3">
-                <label htmlFor="password" className="form-label">
-                Old Password
-                </label>
-                <input id="password" value={password} onChange={(e) => setPassword(e.target.value)} className="form-control shadow-sm" 
-                placeholder="password" />
-            </div>
-            <div className="mb-3">
-                <label htmlFor="npassword" className="form-label">
-                New Password
-                </label>
-                <input id="npassword" value={password} onChange={(e) => setNPassword(e.target.value)} className="form-control shadow-sm" 
-                placeholder="password" />
-            </div>
-            <button type="submit" className="btn btn-primary px-5">
-                Change
-            </button>
+                <div className="mb-3 row">
+                    <div className="col">
+                        <img src={`${backendUrl}/${imageUrl}`} alt="User" className="avatar-profile"/>
+                    </div>
+                </div>
+                <div className="mb-3 row">
+                    <div className="col">
+                        <label htmlFor="username" className="form-label">
+                        Username
+                        </label>
+                        <input id="username" value={username} onChange={(e) => setUsername(e.target.value)} className="form-control shadow-sm" 
+                        placeholder="username" />
+                    </div>
+                </div>
+                <div className="mb-3 row">
+                    <div className="col">
+                        <label htmlFor="firstname" className="form-label">
+                        First Name
+                        </label>
+                        <input id="firstname" value={firstname} onChange={(e) => setFirstname(e.target.value)} className="form-control shadow-sm" 
+                        type="text" placeholder="first name" />
+                    </div>
+                    <div className="col">
+                        <label htmlFor="lastname" className="form-label">
+                        Last Name
+                        </label>
+                        <input id="lastname" value={lastname} onChange={(e) => setLastname(e.target.value)} className="form-control shadow-sm" 
+                        type="text" placeholder="last name" />
+                    </div>
+                </div>
+                <div className="mb-3 row">
+                    <div className="col">
+                        <button type="submit" className="btn btn-primary w-100" disabled>
+                            Change
+                        </button>
+                    </div>
+                </div>
             </form>
         </div>
         </>

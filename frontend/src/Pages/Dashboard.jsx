@@ -1,6 +1,7 @@
-import React, {useState, useEffect} from 'react'
-import getTimeAgo from '../Methods/TimestampCalculation';
+import {useState, useEffect} from 'react'
 import axios from "axios";
+import getTimeAgo from '../Methods/TimestampCalculation';
+import LocalStorageVariables from "../Methods/LocalStorageVariables";
 import "../App.css"
 
 export default function Dashboard() {
@@ -8,13 +9,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const access = localStorage.getItem("access");
-  const config = {
-    headers: {
-      'Authorization': `Bearer ${access}`,
-      'Content-Type': 'application/json'
-    }
-  }
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const config = LocalStorageVariables("config");
 
   const deletePost = async (e) => {
     e.preventDefault();
@@ -22,7 +18,7 @@ export default function Dashboard() {
     setLoading(true);
 
     try {
-      const response = await axios.delete("http://127.0.0.1:8000/social/user-posts/",
+      const response = await axios.delete(`${backendUrl}/social/user-posts/`,
         {
           data: {postId: e.currentTarget.id},
           headers : config["headers"]
@@ -45,7 +41,7 @@ export default function Dashboard() {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://127.0.0.1:8000/social/user-posts/", config);
+        const response = await axios.get(`$${backendUrl}/social/user-posts/`, config);
         setGetPostsData(response.data);
         setError(null);
       } catch (err) {
@@ -75,7 +71,7 @@ export default function Dashboard() {
             <div className="post-container mt-4 shadow-sm" key={index}>
               <div className="post-header">
                 <div className="d-flex align-items-center">
-                  <img src={`http://127.0.0.1:8000/media/${ post.user__userprofile__image}`}
+                  <img src={`${backendUrl}/media/${ post.user__userprofile__image}`}
                     alt="Profile" className="avatar me-3"/>
                   <div className="flex-grow-1">
                     <div className="d-flex align-items-center">

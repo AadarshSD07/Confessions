@@ -1,6 +1,6 @@
 # views.py
+from configuration import Config
 from django.views.generic import TemplateView
-from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -26,4 +26,4 @@ class ReactAppView(TemplateView):
 class HeaderDetails(APIView):
     def get(self, request, format=None):
         response = fetch_user_details(request)
-        return Response(response, status=status.HTTP_200_OK)
+        return Response(response, status=Config.success)

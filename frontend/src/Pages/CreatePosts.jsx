@@ -1,21 +1,18 @@
 import { useState } from "react";
+import LocalStorageVariables from "../Methods/LocalStorageVariables";
 import axios from "axios";
 
 export default function CreatePosts() {
   const [desc, setDesc] = useState("");
 
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const Submit = async (e) => {
     e.preventDefault();
-    const access = localStorage.getItem("access");
-    const config = {
-    headers: {
-      'Authorization': `Bearer ${access}`,
-      'Content-Type': 'application/json'
-    }
-    };
+    const config = LocalStorageVariables("config");
+
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/social/user-posts/",
+        `${backendUrl}/social/user-posts/`,
         {
           desc: desc
         },

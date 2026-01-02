@@ -1,26 +1,23 @@
-import React, {useState, useEffect} from 'react'
-import axios from "axios";
+import {useState, useEffect} from 'react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import Dashboard from './Pages/Dashboard';
+import axios from "axios";
+import ChangePassword from './Pages/ChangePassword';
 import CreatePosts from './Pages/CreatePosts';
-import ViewPosts from './Pages/ViewPosts';
+import Dashboard from './Pages/Dashboard';
+import LocalStorageVariables from "../Methods/LocalStorageVariables";
 import Profile from './Pages/Profile';
+import ViewPosts from './Pages/ViewPosts';
 
 function Content(props) {
     const [getHeaderDetails, setHeaderDetails] = useState([]);
 
-    const access = localStorage.getItem("access");
-    const config = {
-        headers: {
-        'Authorization': `Bearer ${access}`,
-        'Content-Type': 'application/json'
-        }
-    }
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const config = LocalStorageVariables("config");
 
     useEffect(() => {
         const userDetails = async () => {
         try {
-            const response = await axios.get("http://127.0.0.1:8000/header/", config);
+            const response = await axios.get(`${backendUrl}/header/`, config);
             setHeaderDetails(response.data);
         } catch (err) {
             console.error('Error:', err);
@@ -46,8 +43,8 @@ function Content(props) {
                 { getHeaderDetails ?
               <nav className="navbar-nav me-auto mb-2 mb-lg-0">
                 <Link className="nav-link" to="/">👤Dashboard</Link>
-                <Link className="nav-link" to="/view_posts">📝View Posts</Link>
-                <Link className="nav-link" to="/create_posts">➕Create Post</Link>
+                <Link className="nav-link" to="/view-posts">📝View Posts</Link>
+                <Link className="nav-link" to="/create-posts">➕Create Post</Link>
               </nav>
               : ""
               }
@@ -55,14 +52,16 @@ function Content(props) {
                 <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                     <li className="nav-item dropdown">
                       <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src={`http://127.0.0.1:8000${getHeaderDetails.userImage}`} alt="User" className="avatar me-3"/>
+                        <img src={`${backendUrl}${getHeaderDetails.userImage}`} alt="User" className="avatar me-3"/>
                         {getHeaderDetails.fullName}
                       </a>
                       <ul className="dropdown-menu">
                         <li>
                           <Link className="dropdown-item" to="/profile">👤Profile</Link>
                         </li>
-                        <li><a className="dropdown-item" href="#">Another action</a></li>
+                        <li>
+                          <Link className="dropdown-item" to="/change-password">🗝️Change Password</Link>
+                        </li>
                         <li><hr className="dropdown-divider"/></li>
                         <li><a className="dropdown-item" href="#" onClick={() => props.logout()}>🚪{"Logout"}</a></li>
                       </ul>
@@ -75,9 +74,10 @@ function Content(props) {
         <div className='page-content mt-4'>
           <Routes>
               <Route path="/" element={<Dashboard />} />
-              <Route path="/view_posts" element={<ViewPosts />} />
-              <Route path="/create_posts" element={<CreatePosts />} />
+              <Route path="/view-posts" element={<ViewPosts />} />
+              <Route path="/create-posts" element={<CreatePosts />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/change-password" element={<ChangePassword />} />
           </Routes>
         </div>
     </BrowserRouter>

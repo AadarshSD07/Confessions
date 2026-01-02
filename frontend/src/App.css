@@ -99,6 +99,13 @@
     object-fit: cover;
 }
 
+.avatar-profile {
+    height: 20rem;
+    width: 20rem;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
 .username {
     color: #8b98a5;
     font-size: 0.95rem;

@@ -1,9 +1,12 @@
-import React, {useState, useEffect} from 'react'
-import axios from "axios";
-import Login from './Pages/Login'
+import {useState, useEffect} from 'react'
 import { jwtDecode } from 'jwt-decode';
+import axios from "axios";
 import Content from './Content';
+import LocalStorageVariables from "../Methods/LocalStorageVariables";
+import Login from './Pages/Login'
 import './App.css'
+
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const isTokenValid = (token) => {
   if (!token) return false;
@@ -17,12 +20,17 @@ const isTokenValid = (token) => {
   }
 };
 
+const removeAccessRefresh = () => {
+  localStorage.removeItem("access");
+  localStorage.removeItem("refresh");
+}
+
 const refreshAccessToken = async () => {
   try {
-    const refresh = localStorage.getItem("refresh");
+    const refresh = LocalStorageVariables("refresh");
     if (!refresh) return false;
     
-    const response = await axios.post("http://127.0.0.1:8000/auth/refresh/",
+    const response = await axios.post(`${backendUrl}/auth/refresh/`,
       {refreshToken: refresh}
     );
 
@@ -32,8 +40,7 @@ const refreshAccessToken = async () => {
       }
     return false;
   } catch (err) {
-    localStorage.removeItem("refresh");
-    localStorage.removeItem("access");
+    removeAccessRefresh();
     console.error('Error refreshing token:', err);
     return false;
   }
@@ -43,18 +50,13 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const access = localStorage.getItem("access");
-  const config = {
-    headers: {
-      'Authorization': `Bearer ${access}`,
-      'Content-Type': 'application/json'
-    }
-  }
+  const config = LocalStorageVariables("config");
+  const access = LocalStorageVariables("access");
 
   useEffect(() => {
     const checkAuth = async () => {
       // Check if tokens exist
-      if (localStorage.length === 0 || !localStorage.getItem("access")) {
+      if (localStorage.length === 0 || !access) {
         setIsAuthenticated(false);
         setLoading(false);
         return;
@@ -77,8 +79,7 @@ function App() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
+    removeAccessRefresh();
     window.location.href = "/";
   }
 
