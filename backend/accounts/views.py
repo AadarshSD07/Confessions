@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .permissions import HasRole
-from .serializers import ChangePasswordSerializer
+from .serializers import ChangePasswordSerializer, ProfileInformationSerializer
 
 # Create your views here.
 
@@ -18,38 +18,27 @@ class AdminOnlyView(APIView):
     def get(self, request):
         return Response({"message": "Admin access granted"})
 
-class UserProfileInformation(APIView):
+class UserProfileInformation(generics.UpdateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ProfileInformationSerializer
 
     def get(self, request):
-        user_details = {
-            "username": request.user.username,
-            "firstName": request.user.first_name,
-            "lastName": request.user.last_name
-        }
-        try:
-            imageUrl = request.user.userprofile_set.get().image.url
-        except Exception as e:
-            imageUrl = "/media/user_profile_images/default-user-image.png"
-
-        user_details["imageUrl"] = imageUrl
+        user_details = self.serializer_class().get(request.user)
         return Response(user_details, status=Config.success)
 
     def post(self, request):
-        post_data = request.data
-        user_password = User.check_password(post_data["password"])
-        if user_password:
-            User.set_password(post_data["npassword"])
-            response_status = Config.accepted
-        else:
-            response_status = Config.forbidden
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            post_data = self.serializer_class().post(request.user, request.data)
+            return Response(status=Config.success)
 
-        return Response(status=response_status)
+        return Response(serializer.errors, status=Config.bad_request)
 
 class ChangePasswordView(generics.UpdateAPIView):
-    serializer_class = ChangePasswordSerializer
+    authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ChangePasswordSerializer
 
     def get_object(self):
         return self.request.user

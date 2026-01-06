@@ -68,10 +68,13 @@ function Content(props) {
                     </li>
                 </ul>
               </div>
+              <ul className="mb-2 mb-lg-0">
+                <span></span>
+              </ul>
             </div>
           </div>
         </nav>
-        <div className='page-content mt-4'>
+        <div className='page-content mt-4 pb-5'>
           <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/view-posts" element={<ViewPosts />} />
