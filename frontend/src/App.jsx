@@ -1,9 +1,8 @@
 import {useState, useEffect} from 'react'
 import { jwtDecode } from 'jwt-decode';
 import axios from "axios";
-import Content from './Content';
+import Header from './Components/Header';
 import LocalStorageVariables from './Methods/LocalStorageVariables';
-import Login from './Pages/Login'
 import './App.css'
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -79,7 +78,7 @@ function App() {
 
   const handleLogout = () => {
     removeAccessRefresh();
-    window.location.href = "/";
+    window.location.href = "/login";
   }
 
   if (loading) {
@@ -90,16 +89,9 @@ function App() {
     );
   }
 
-  if (isAuthenticated){
-    return (
-      <>
-      <Content logout={handleLogout} />
-      </>
-    )
-  } 
   return (
     <>
-    <Login />
+    <Header logout={handleLogout} isAuthenticated={isAuthenticated}/>
     </>
   )
 }

@@ -48,6 +48,10 @@
   place-items: center;
 }
 
+.white-card {
+  background-color: #ffffff;
+}
+
 .app-grid {
   display: grid;
   grid-template-columns: 250px 1fr;
@@ -57,6 +61,11 @@
 
 .grey-background {
   background-color: #ebeef1;
+}
+
+.sslogo {
+  height: 50px;
+  width: 75px;
 }
 
 .sidebars {
@@ -152,4 +161,49 @@
 
 .svgButton:hover {
   border-color: transparent;
+}
+
+.field-width {
+  width: 75%;
+}
+
+.divider:after,
+.divider:before {
+content: "";
+flex: 1;
+height: 1px;
+background: #eee;
+}
+.h-custom {
+height: calc(100% - 73px);
+}
+
+.hide {
+  display: none;
+}
+
+
+@media (max-width: 450px) {
+.h-custom {
+height: 100%;
+}
+}
+
+
+@media (min-width: 530px) {
+  .field-width {
+    width: 25rem;
+  }
+}
+
+@media (min-width: 790px) {
+  .field-width {
+    width: 50%;
+  }
+}
+
+@media (min-width: 1300px) {
+  .field-width {
+    width: 40rem;
+  }
 }

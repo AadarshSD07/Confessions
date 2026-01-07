@@ -18,6 +18,13 @@ class AdminOnlyView(APIView):
     def get(self, request):
         return Response({"message": "Admin access granted"})
 
+class UserRegistration(generics.GenericAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        return Response(status=Config.success)
+
 class UserProfileInformation(generics.UpdateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
@@ -30,8 +37,10 @@ class UserProfileInformation(generics.UpdateAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            post_data = self.serializer_class().post(request.user, request.data)
-            return Response(status=Config.success)
+            _ = self.serializer_class().post(request.user, request.data)
+            return Response(
+                {"message": "Data saved successfully."},
+                status=Config.success)
 
         return Response(serializer.errors, status=Config.bad_request)
 

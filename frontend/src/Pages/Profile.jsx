@@ -4,7 +4,6 @@ import axios from "axios";
 
 export default function Profile() {
     const [email, setEmail] = useState("");
-    const [status, setStatus] = useState("");
     const [firstname, setFirstname] = useState("");
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState("");
@@ -46,7 +45,6 @@ export default function Profile() {
 
     // Handle image selection
     const handleImageChange = (e) => {
-        debugger
         const file = e.target.files[0];
         if (file) {
         setImageFile(file);
@@ -59,53 +57,45 @@ export default function Profile() {
         }
     };
 
-    // Handle image upload to backend
-    const handleUpload = async () => {
-        if (!imageFile) return;
-        const formData = new FormData();
-        formData.append('image', imageFile);
-        try {
-            debugger
-            const response = await fetch('/api/upload-profile-image', {
-                method: 'POST',
-                body: formData,
-        });
-        const data = await response.json();
-        if (data.success) {
-            setImageUrl(data.imageUrl);
-            setImagePreview('');
-            setImageFile(null);
-        }
-        } catch (error) {
-        console.error('Error uploading image:', error);
-        }
-    };
-
     // Trigger file input click
     const handleAvatarClick = () => {
         fileInputRef.current.click();
     };
 
+    // Handle image removal
+    const handleImageRemoval = () => {
+        setImageFile(null);
+        setImagePreview('');
+        fileInputRef.current.value = '';
+    }
+
     const Submit = async (e) => {
         e.preventDefault();
-        let userPostData = {
-            username: username,
-            first_name: firstname,
-            last_name: lastname,
-            email: email,
-            imageUrl: imageFile
+        // Create FormData object
+        const formData = new FormData();
+
+        // Add text fields
+        formData.append('username', username);
+        formData.append('first_name', firstname);
+        formData.append('last_name', lastname);
+        formData.append('email', email);
+
+        // Add file if selected
+        const fileInput = fileInputRef.current;
+        if (fileInput.files.length > 0) {
+            formData.append('imageUrl', fileInput.files[0]);
         }
+
         const config = LocalStorageVariables("config");
+        config["headers"]["Content-Type"] = "multipart/form-data"
+
         try {
-            debugger
             const response = await axios.post(
                 `${backendUrl}/accounts/user-details/`,
-                userPostData,
+                formData,
                 config
             );
-            debugger
             if (response.status === 200){
-                setStatus("Data saved successfully!");
                 window.location.href = "/profile";
             }
 
@@ -126,11 +116,6 @@ export default function Profile() {
     return (
         <>
         <div className="w-25 container">
-            {status && (
-                <div className="alert alert-success" role="alert">
-                {status}
-                </div>
-            )}
             <form onSubmit={Submit}>
                 <div className="row">
                     <div className="col">
@@ -161,11 +146,7 @@ export default function Profile() {
                             {/* Upload button (only show when image is selected) */}
                             {imageFile && (
                                 <div className="mt-4 space-x-2">
-                                    <button onClick={handleUpload}
-                                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                                            Upload Image
-                                    </button>
-                                    <button onClick={() => { setImageFile(null); setImagePreview(''); }}
+                                    <button onClick={handleImageRemoval}
                                         className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors" >
                                             Cancel
                                     </button>

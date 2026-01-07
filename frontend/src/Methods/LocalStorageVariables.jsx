@@ -6,8 +6,8 @@ const LocalStorageVariables = (props) => {
         const access = localStorage.getItem("access");
         response = {
             headers: {
-            'Authorization': `Bearer ${access}`,
-            'Content-Type': 'application/json'
+                'Authorization': `Bearer ${access}`,
+                'Content-Type': 'application/json'
             }
         };
     } else {

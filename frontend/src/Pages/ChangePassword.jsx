@@ -2,7 +2,7 @@ import { useState } from "react";
 import LocalStorageVariables from "../Methods/LocalStorageVariables";
 import axios from "axios";
 
-export default function Profile() {
+export default function ChangePassword() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [npassword, setNPassword] = useState("");

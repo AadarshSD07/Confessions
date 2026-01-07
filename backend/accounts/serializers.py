@@ -6,12 +6,22 @@ from rest_framework.exceptions import ValidationError
 
 User = get_user_model()
 
+class UserRegistrationSeriailiser(serializers.Serializer):
+    username=serializers.CharField(required=True)
+    password=serializers.CharField(required=True, write_only=True)
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+    email = serializers.CharField(required=True)
+
+    def post(self, post_data):
+        pass
+
 class ProfileInformationSerializer(serializers.Serializer):
-    username=serializers.CharField(required=True, write_only=True)
-    first_name = serializers.CharField(required=True, write_only=True)
-    last_name = serializers.CharField(required=True, write_only=True)
-    email = serializers.CharField(required=True, write_only=True, allow_blank=True)
-    imageUrl = serializers.CharField(required=True, write_only=True, allow_null=True)
+    username=serializers.CharField(required=True)
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+    email = serializers.CharField(required=True, allow_blank=True)
+    imageUrl = serializers.ImageField(allow_null=True)
 
     def get(self, user_instance=None):
         """
@@ -83,7 +93,7 @@ class ProfileInformationSerializer(serializers.Serializer):
                     if user_profile:
                         # Assuming value is a file path or URL
                         # You need to implement actual image saving logic
-                        # user_profile.image = value
+                        user_profile.image = value
                         user_profile.save()
                         updated_fields.append(field_name)
                 except Exception as e:
@@ -101,7 +111,6 @@ class ProfileInformationSerializer(serializers.Serializer):
                         continue
 
                     if field_name == 'email':
-                        import pdb; pdb.set_trace()
                         # Basic email validation
                         if '@' not in value:
                             raise ValueError(f"Invalid email format: {value}")
