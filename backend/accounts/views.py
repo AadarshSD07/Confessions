@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .permissions import HasRole
-from .serializers import ChangePasswordSerializer, ProfileInformationSerializer
+from .serializers import ChangePasswordSerializer, ProfileInformationSerializer, UserRegistrationSerializer
 
 # Create your views here.
 
@@ -18,11 +18,17 @@ class AdminOnlyView(APIView):
     def get(self, request):
         return Response({"message": "Admin access granted"})
 
-class UserRegistration(generics.GenericAPIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
+class UserRegistration(generics.CreateAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = UserRegistrationSerializer
 
     def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"message": "User created successfully."},
+                status=Config.success)
         return Response(status=Config.success)
 
 class UserProfileInformation(generics.UpdateAPIView):

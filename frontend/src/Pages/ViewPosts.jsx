@@ -68,7 +68,9 @@ export default function ViewPosts() {
     <h3 className='fs-3'>All Posts</h3>
     <div className="container">
       { socialPosts.length < 1 ? (
-        "No Posts To Display"
+        <div className="mt-4 text-center">
+          <p>No Posts To Display</p>
+        </div>
       ) :(
         socialPosts.map((post, index) => (
             <div className="post-container mt-4 shadow-sm" key={index}>

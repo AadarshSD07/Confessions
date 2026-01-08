@@ -21,7 +21,7 @@ from django.contrib import admin
 from django.http import HttpResponse
 from django.views.generic import TemplateView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from SocialStack import views
+from SocialStack.views import HeaderDetails
 
 def show_urls(request):
     resolver = get_resolver()
@@ -35,7 +35,7 @@ urlpatterns = [
     path('debug-urls/', show_urls),
     path("auth/login/", TokenObtainPairView.as_view()),
     path("auth/refresh/", TokenRefreshView.as_view()),
-    path('header/', views.HeaderDetails.as_view(), name='header_details'),
+    path('header/', HeaderDetails.as_view(), name='header_details'),
     path("accounts/", include("accounts.urls")),
     path("social/", include("social.urls")),
     path('', TemplateView.as_view(template_name='index.html')),

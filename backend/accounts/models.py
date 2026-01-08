@@ -60,4 +60,4 @@ def user_role_creation(sender, instance, created, **kwargs):
     
     assigning_role = "admin" if roles_created else "user"
     if created and not UserRole.objects.filter(user=instance).exists():
-        UserRole.objects.create(user=instance, role=roles.filter(role=assigning_role))
+        UserRole.objects.create(user=instance, role=roles.filter(role=assigning_role).first())

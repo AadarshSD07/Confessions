@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Header from "../Components/Header";
 import axios from "axios";
 
 const Register = () => {
@@ -28,17 +27,39 @@ const Register = () => {
         formData.append('password', password);
 
         try {
-            const response = await axios.post(
-                `${backendUrl}/auth/register/`,
+            // Step 1: Register the user
+            const registrationResponse = await axios.post(
+                `${backendUrl}/accounts/register/`,
                 {
-                username: username,
-                email: email,
-                password: password,
+                    username: username,
+                    email: email,
+                    first_name: firstname,
+                    last_name: lastname,
+                    password: password
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
                 }
             );
 
-            localStorage.setItem("access", response.data.access);
-            localStorage.setItem("refresh", response.data.refresh);
+            console.log('Registration successful:', registrationResponse.data);
+
+            // Step 2: Auto-login only if registration succeeded
+            const loginResponse = await axios.post(
+                `${backendUrl}/auth/login/`,
+                {
+                    username: username,
+                    password: password,
+                }
+            );
+
+            // Step 3: Store tokens
+            localStorage.setItem('access', loginResponse.data.access);
+            localStorage.setItem('refresh', loginResponse.data.refresh);
+
+            // Step 4: Redirect or update UI
             window.location.href = "/";
         } catch (err) {
             setError("Invalid credentials");
@@ -96,7 +117,7 @@ const Register = () => {
                 </div>
                 
                 <button type="submit" className="btn btn-primary mt-2" disabled={loading}>
-                    {loading ? 'Logging in...' : 'SIGN UP'}
+                    {loading ? 'SIGNING UP...' : 'SIGN UP'}
                 </button>
             </form>
         </div>

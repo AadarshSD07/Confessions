@@ -1,6 +1,7 @@
 # views.py
 from configuration import Config
 from django.views.generic import TemplateView
+from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -24,6 +25,8 @@ class ReactAppView(TemplateView):
         return context
 
 class HeaderDetails(APIView):
-    def get(self, request, format=None):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
         response = fetch_user_details(request)
         return Response(response, status=Config.success)

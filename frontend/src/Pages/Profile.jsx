@@ -84,10 +84,12 @@ export default function Profile() {
         const fileInput = fileInputRef.current;
         if (fileInput.files.length > 0) {
             formData.append('imageUrl', fileInput.files[0]);
+        } else {
+            formData.append('imageUrl', []);
         }
 
         const config = LocalStorageVariables("config");
-        config["headers"]["Content-Type"] = "multipart/form-data"
+        config["headers"]["Content-Type"] = "multipart/form-data";
 
         try {
             const response = await axios.post(
