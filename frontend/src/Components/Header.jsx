@@ -13,6 +13,10 @@ import ViewPosts from '../Pages/ViewPosts';
 const NavbarWithRouter = () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const fetchLocation = useLocation();
+    if (!["/register","/login","/"].includes(fetchLocation.pathname)) {
+        localStorage.setItem("redirectPath", fetchLocation.pathname);
+        window.location.href = "/";
+    }
     
     return (
         <nav className="navbar navbar-expand-lg bg-body-tertiary">

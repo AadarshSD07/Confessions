@@ -3,7 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 import axios from "axios";
 import Header from './Components/Header';
 import LocalStorageVariables from './Methods/LocalStorageVariables';
-import './App.css'
+import './CSS/App.css'
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -44,6 +44,8 @@ const refreshAccessToken = async () => {
     return false;
   }
 }
+
+
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

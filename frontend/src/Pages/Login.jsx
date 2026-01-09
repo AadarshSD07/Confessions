@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {Routes, Route, Link} from 'react-router-dom';
+import {Routes, Route, Link, redirect} from 'react-router-dom';
 import axios from "axios";
 
 const Login = () => {
@@ -9,6 +9,8 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const redirectPath = localStorage.getItem("redirectPath");
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -25,7 +27,8 @@ const Login = () => {
 
       localStorage.setItem("access", response.data.access);
       localStorage.setItem("refresh", response.data.refresh);
-      window.location.href = "/";
+      window.location.href = redirectPath ? redirectPath: "/";
+
     } catch (err) {
       setError("Invalid credentials");
     } finally {
