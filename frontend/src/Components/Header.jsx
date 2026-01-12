@@ -6,12 +6,14 @@ import CreatePosts from '../Pages/CreatePosts';
 import Dashboard from '../Pages/Dashboard';
 import LocalStorageVariables from '../Methods/LocalStorageVariables';
 import Login from '../Pages/Login';
+import Posts from '../Pages/Posts';
 import Profile from '../Pages/Profile';
 import Register from '../Pages/Register';
+import Search from '../Pages/Search';
 import ViewPosts from '../Pages/ViewPosts';
 
 const NavbarWithRouter = (props) => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
     const fetchLocation = useLocation();
 
     if (!props.isAuthenticated) {
@@ -25,7 +27,7 @@ const NavbarWithRouter = (props) => {
             <nav className="navbar navbar-expand-lg bg-body-tertiary">
                 <div className="container-fluid">
                     <a className="navbar-brand" href="/">
-                        <img src={`${backendUrl}/media/logo/SSLNewShortSVG.png`}
+                        <img src={`${backendDomain}/media/logo/SSLNewShortSVG.png`}
                             className="img-fluid sslogo" alt="Sample image" />
                     </a>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,7 +71,7 @@ const NavbarWithRouter = (props) => {
             <nav className="navbar navbar-expand-lg bg-body-tertiary">
                 <div className="container-fluid">
                     <a className="navbar-brand" href="/">
-                        <img src={`${backendUrl}/media/logo/SSLNewShortSVG.png`}
+                        <img src={`${backendDomain}/media/logo/SSLNewShortSVG.png`}
                             className="img-fluid sslogo" alt="Sample image" />
                     </a>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,6 +86,7 @@ const NavbarWithRouter = (props) => {
                                 <Link className="nav-link" to="/">👤Dashboard</Link>
                                 <Link className="nav-link" to="/view-posts">📝View Posts</Link>
                                 <Link className="nav-link" to="/create-posts">➕Create Post</Link>
+                                <Link className="nav-link" to="/search">🔍Search</Link>
                             </nav>
                             : ""
                         }
@@ -91,7 +94,7 @@ const NavbarWithRouter = (props) => {
                             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                                 <li className="nav-item dropdown">
                                     <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <img src={`${backendUrl}${props.getHeaderDetails.userImage}`} alt="User" className="avatar me-3"/>
+                                        <img src={`${backendDomain}${props.getHeaderDetails.userImage}`} alt="User" className="avatar me-3"/>
                                         {props.getHeaderDetails.fullName}
                                     </a>
                                     <ul className="dropdown-menu">
@@ -120,6 +123,7 @@ const NavbarWithRouter = (props) => {
                     <Route path="/create-posts" element={<CreatePosts />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/change-password" element={<ChangePassword />} />
+                    <Route path="/search" element={<Search />} />
                 </Routes>
             </div>
             </>
@@ -131,13 +135,13 @@ const NavbarWithRouter = (props) => {
 export default function Header(props) {
     const [getHeaderDetails, setHeaderDetails] = useState([]);
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
     const config = LocalStorageVariables("config");
 
     useEffect(() => {
         const userDetails = async () => {
         try {
-            const response = await axios.get(`${backendUrl}/header/`, config);
+            const response = await axios.get(`${backendDomain}/header/`, config);
             setHeaderDetails(response.data);
         } catch (err) {
             console.error('Error:', err);

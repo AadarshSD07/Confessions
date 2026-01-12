@@ -8,7 +8,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
   const redirectPath = localStorage.getItem("redirectPath");
 
   const handleSubmit = async (e) => {
@@ -18,7 +18,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        `${backendUrl}/auth/login/`,
+        `${backendDomain}/auth/login/`,
         {
           username: username,
           password: password,

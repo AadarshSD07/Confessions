@@ -7,9 +7,8 @@ const PostEdit = (props) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editComment, setEditComment] = useState(props.post.post_desc);
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
     const config = LocalStorageVariables("config");
-    let post = props.post;
     const userLikedPosts = props.getPostsData.userLikedPosts;
     const userComments = props.getPostsData.userComments;
 
@@ -20,7 +19,7 @@ const PostEdit = (props) => {
 
     const handleSave = async (postID) => {
         try {
-            const response = await fetch(`${backendUrl}/social/user-posts/`, {
+            const response = await fetch(`${backendDomain}/social/user-posts/`, {
                 method: 'PATCH',
                 headers: config["headers"],
                 body: JSON.stringify({ editedComment: editComment, postId: postID})
@@ -50,8 +49,8 @@ const PostEdit = (props) => {
                     autoFocus
                 />
                 <div className="edit-buttons">
-                    <button onClick={() => handleSave(post.id)}>Save</button>
-                    <button onClick={() => handleCancel(post)}>Cancel</button>
+                    <button onClick={() => handleSave(props.post.id)}>Save</button>
+                    <button onClick={() => handleCancel(props.post)}>Cancel</button>
                 </div>
             </div>
         ) : (
@@ -59,7 +58,7 @@ const PostEdit = (props) => {
             <p className="post-text">
                 {editComment}
             </p>
-            {   post.editedPost ? 
+            {   props.post.editedPost ?
                     <div className="row">
                         <div className="col"></div>
                         <div className="col col-sm-1">
@@ -70,11 +69,11 @@ const PostEdit = (props) => {
                     ""
             }
             <SocialPost
-                userComments={userComments[post.id] ? userComments[post.id] : []}
-                userLiked={userLikedPosts.includes(post.id)}
-                likesCount={post.likes_count}
-                post={post}
-                postEditable={getTimeAgoBoolean(post.created_at_str)}
+                userComments={userComments[props.post.id] ? userComments[props.post.id] : []}
+                userLiked={userLikedPosts.includes(props.post.id)}
+                likesCount={props.post.likes_count}
+                post={props.post}
+                postEditable={getTimeAgoBoolean(props.post.created_at_str) && props.postEditingPermission}
                 handleEditClick={handleEditClick}
             />
             </>

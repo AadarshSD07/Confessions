@@ -11,7 +11,7 @@ export default function CreatePosts() {
   const [statusMessage, setStatusMessage] = useState("");
 
   const fileInputRef = useRef(null);
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
 
   // Handle image selection
   const handleImageChange = (e) => {
@@ -60,7 +60,7 @@ export default function CreatePosts() {
 
     try {
       const response = await axios.post(
-        `${backendUrl}/social/user-posts/`,
+        `${backendDomain}/social/user-posts/`,
         formData,
         config
       );
@@ -104,7 +104,7 @@ export default function CreatePosts() {
                     ) : imageUrl ? (
                         // Show backend image if available
                         <div className="postImageContainer" onClick={handleAvatarClick}>
-                          <img src={`${backendUrl}${imageUrl}`} alt="User"
+                          <img src={`${backendDomain}${imageUrl}`} alt="User"
                               className="postImage me-3" />
                         </div>
                     ) : (

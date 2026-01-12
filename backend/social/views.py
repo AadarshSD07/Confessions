@@ -1,8 +1,8 @@
-from accounts.models import UserProfile
+from accounts.models import User
 from collections import defaultdict
 from configuration import Config
 from django.db.models.functions import Cast, Coalesce
-from django.db.models import CharField, Count, Value
+from django.db.models import Count, CharField, Value, Case, When, BooleanField, Q
 from rest_framework import permissions
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.views import APIView
@@ -17,24 +17,58 @@ class FetchSocialPosts(APIView):
     queryset = UserPost.objects.all()
 
     def get(self, request, format=None):
-        total_posts = list(
-            self.queryset.annotate(
-                created_at_str=Cast('created_at', CharField()),
-                # Coalesce ensures that if Count is None, it returns 0
-                likes_count=Coalesce(Count('likes'), Value(0))
-            ).values(
-                "id",
-                "imageurl",
-                "user__username",
-                "user__userprofile__image",
-                "user__first_name",
-                "user__last_name",
-                "post_desc",
-                "editedPost",
-                "created_at_str",
-                "likes_count"
-            ).order_by("-created_at")
-        )
+        if format:
+            total_posts = list(
+                self.queryset.annotate(
+                    created_at_str=Cast('created_at', CharField()),
+                    # Coalesce ensures that if Count is None, it returns 0
+                    likes_count=Coalesce(Count('likes'), Value(0)),
+                    same_user=Case(
+                        When(user__username=request.user.username, then=Value(True)),
+                        default=Value(False),
+                        output_field=BooleanField()
+                    )
+                ).filter(
+                    post_desc__icontains = format
+                ).values(
+                    "id",
+                    "imageurl",
+                    "user__username",
+                    "user__userprofile__image",
+                    "user__first_name",
+                    "user__last_name",
+                    "post_desc",
+                    "editedPost",
+                    "created_at_str",
+                    "likes_count",
+                    "same_user"
+                ).order_by("-created_at")
+            )
+        else:
+            total_posts = list(
+                self.queryset.annotate(
+                    created_at_str=Cast('created_at', CharField()),
+                    # Coalesce ensures that if Count is None, it returns 0
+                    likes_count=Coalesce(Count('likes'), Value(0)),
+                    same_user=Case(
+                        When(user__username=request.user.username, then=Value(True)),
+                        default=Value(False),
+                        output_field=BooleanField()
+                    )
+                ).values(
+                    "id",
+                    "imageurl",
+                    "user__username",
+                    "user__userprofile__image",
+                    "user__first_name",
+                    "user__last_name",
+                    "post_desc",
+                    "editedPost",
+                    "created_at_str",
+                    "likes_count",
+                    "same_user"
+                ).order_by("-created_at")
+            )
         # liked_posts = list(PostLike.objects.filter(user=request.user).values_list("post__id", flat=True))
         liked_posts = list(
             PostLike.objects.filter(
@@ -76,6 +110,8 @@ class FetchSocialPosts(APIView):
             "userLikedPosts": liked_posts,
             "userComments": comments_dict
         }
+        if format:
+            return response
         return Response(response, status=Config.success)
     
     def delete(self, request):
@@ -218,3 +254,31 @@ class PostsComment(APIView):
         comment = self.queryset.create(user = request.user, comment=post_data["comment"], post=post)
         comment.save()
         return Response(status=Config.success)
+
+
+class SearchUsersPosts(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = UserPost.objects.all()
+
+    def get(self, request, search_text):
+        users = list(
+            User.objects.filter(
+                Q(username__icontains=search_text)   |
+                Q(first_name__icontains=search_text) |
+                Q(last_name__icontains=search_text)
+            ).values(
+                "id",
+                "first_name",
+                "last_name",
+                "username",
+                "userprofile__image"
+            )
+        )
+        fetch_social_posts = FetchSocialPosts()
+        posts = fetch_social_posts.get(request, format=search_text)
+        data = {
+            "users": users,
+            "posts": posts
+        }
+        return Response(data, status=Config.success)

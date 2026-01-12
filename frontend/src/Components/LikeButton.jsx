@@ -13,13 +13,13 @@ const SocialPost = (props) => {
   const [newComment, setNewComment] = useState('');
 
   let commentsLength = comments ? comments.length : 0;
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
   const config = LocalStorageVariables("config");
 
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-          const response = await axios.get(`${backendUrl}/header/`, config);
+          const response = await axios.get(`${backendDomain}/header/`, config);
           setUserInformation(response.data);
       } catch (err) {
           console.error('Error:', err);
@@ -35,7 +35,7 @@ const SocialPost = (props) => {
 
     // API call to Django backend
     try {
-      const response = await fetch(`${backendUrl}/social/like/${props.post.id}/`, {
+      const response = await fetch(`${backendDomain}/social/like/${props.post.id}/`, {
         method: 'POST',
         headers: config["headers"],
         body: JSON.stringify({ liked: !liked })
@@ -62,7 +62,7 @@ const SocialPost = (props) => {
     setNewComment('');
 
     // API call to Django backend
-    fetch(`${backendUrl}/social/comment/${props.post.id}/`, {
+    fetch(`${backendDomain}/social/comment/${props.post.id}/`, {
       method: 'POST',
       headers: config["headers"],
       body: JSON.stringify({ comment: newComment })
@@ -130,7 +130,7 @@ const SocialPost = (props) => {
       {showComments && (
         <div className="comments-section">
           <div className="comment-form">
-            <img src={`${backendUrl}${userInformation["userImage"]}`} alt="Your avatar" className="comment-avatar"/>
+            <img src={`${backendDomain}${userInformation["userImage"]}`} alt="Your avatar" className="comment-avatar"/>
             <input type="text" placeholder="Write a comment..." value={newComment}
               onChange={(e) => setNewComment(e.target.value)} className="comment-input"
               onKeyDown={(e) => {
@@ -149,7 +149,7 @@ const SocialPost = (props) => {
             ) : (
               comments.map((comment) => (
                 <div key={comment.id} className="comment-item">
-                  <img src={`${backendUrl}${comment.userImage}`} alt={comment.user} className="comment-avatar"/>
+                  <img src={`${backendDomain}${comment.userImage}`} alt={comment.user} className="comment-avatar"/>
                   <div className="comment-content">
                     <div className="comment-header">
                       <span className="comment-user">{comment.user}</span>

@@ -8,13 +8,13 @@ export default function ChangePassword() {
     const [status, setStatus] = useState("");
     const [statusMessage, setStatusMessage] = useState("");
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
     const Submit = async (e) => {
         e.preventDefault();
         const config = LocalStorageVariables("config");
         try {
             const response = await axios.post(
-                `${backendUrl}/accounts/change-user-password/`,
+                `${backendDomain}/accounts/change-user-password/`,
                 {
                     old_password: password,
                     new_password: npassword,

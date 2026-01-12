@@ -5,7 +5,7 @@ import Header from './Components/Header';
 import LocalStorageVariables from './Methods/LocalStorageVariables';
 import './CSS/App.css'
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
 
 const isTokenValid = (token) => {
   if (!token) return false;
@@ -29,7 +29,7 @@ const refreshAccessToken = async () => {
     const refresh = LocalStorageVariables("refresh");
     if (!refresh) return false;
     
-    const response = await axios.post(`${backendUrl}/auth/refresh/`,
+    const response = await axios.post(`${backendDomain}/auth/refresh/`,
       {refresh: refresh}
     );
 

@@ -10,7 +10,7 @@ const Register = () => {
     const [lastname, setLastname] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
@@ -29,7 +29,7 @@ const Register = () => {
         try {
             // Step 1: Register the user
             const registrationResponse = await axios.post(
-                `${backendUrl}/accounts/register/`,
+                `${backendDomain}/accounts/register/`,
                 {
                     username: username,
                     email: email,
@@ -48,7 +48,7 @@ const Register = () => {
 
             // Step 2: Auto-login only if registration succeeded
             const loginResponse = await axios.post(
-                `${backendUrl}/auth/login/`,
+                `${backendDomain}/auth/login/`,
                 {
                     username: username,
                     password: password,

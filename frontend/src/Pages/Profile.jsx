@@ -14,13 +14,13 @@ export default function Profile() {
 
     const fileInputRef = useRef(null);
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
     useEffect(() => {
         const fetchUserDetails = async () => {
             const config = LocalStorageVariables("config");
             try {
                 const response = await axios.get(
-                    `${backendUrl}/accounts/user-details/`,
+                    `${backendDomain}/accounts/user-details/`,
                     config
                 );
                 if (response.status === 200){
@@ -93,7 +93,7 @@ export default function Profile() {
 
         try {
             const response = await axios.post(
-                `${backendUrl}/accounts/user-details/`,
+                `${backendDomain}/accounts/user-details/`,
                 formData,
                 config
             );
@@ -131,7 +131,7 @@ export default function Profile() {
                                             className="avatar-profile w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg" />
                                     ) : imageUrl ? (
                                         // Show backend image if available
-                                        <img src={`${backendUrl}${imageUrl}`} alt="User"
+                                        <img src={`${backendDomain}${imageUrl}`} alt="User"
                                             className="avatar-profile w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg" />
                                     ) : (
                                         // Fallback if no image

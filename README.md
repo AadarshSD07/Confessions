@@ -10,10 +10,15 @@ A full-stack social media basic application built with Django backend and React 
   - **User**: Standard user with basic permissions
   - **Admin**: Elevated permissions for content moderation
 
+### Registration
+- User can be created using register page located alongside login page
+
 ### User Capabilities
-- Create posts with descriptions
+- Create posts with descriptions and images
 - View their own posts on the dashboard
+- Edit their own post's description on dashboard which is posted less than an hour ago
 - View all posts from any user
+- Add comments or like any posts
 - Delete their own posts
 
 ### Admin Capabilities
@@ -25,6 +30,8 @@ A full-stack social media basic application built with Django backend and React 
 1. **Dashboard**: Displays the logged-in user's posts
 2. **View Posts**: Shows all posts from all users
 3. **Create Post**: Form to create new posts with description field
+4. **Profile**: Form to update user details
+4. **Change Password**: Form to change password using previous password
 
 ## Tech Stack
 
@@ -36,7 +43,8 @@ A full-stack social media basic application built with Django backend and React 
 ### Frontend
 - React
 - React Router (for navigation)
-- Axios (For fetching data from backend)
+- Axios
+- Fetch
 
 ## Project Structure
 
@@ -93,7 +101,7 @@ npm run dev
 
 This command will start:
 - Django backend server (typically on `http://localhost:8000`)
-- React frontend server (typically on `http://localhost:3000` or `http://localhost:5143`)
+- React frontend server (typically on `http://localhost:5143` or `http://localhost:3000`)
 
 ### Running Servers Separately
 
