@@ -32,7 +32,8 @@ A full-stack social media basic application built with Django backend and React 
 2. **View Posts**: Shows all posts from all users
 3. **Create Post**: Form to create new posts with description field
 4. **Profile**: Form to update user details
-4. **Change Password**: Form to change password using previous password
+5. **Change Password**: Form to change password using previous password
+
 
 ## Tech Stack
 
@@ -43,7 +44,7 @@ A full-stack social media basic application built with Django backend and React 
 
 ### Frontend
 - React
-- React Router (for navigation)
+- React Router
 - Axios/Fetch
 
 ## Project Structure
