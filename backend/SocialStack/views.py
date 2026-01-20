@@ -10,7 +10,6 @@ def fetch_user_details(request):
         return {
             "fullName": (request.user.first_name + " " + request.user.last_name)[:15],
             "username": request.user.username,
-            "isUserAdmin": request.user.role.name == "admin",
             "user_image": request.user.profile_image.url
         }
     else:

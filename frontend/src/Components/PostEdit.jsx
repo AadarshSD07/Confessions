@@ -1,27 +1,32 @@
 import {useState} from 'react'
 import { getTimeAgoBoolean } from '../Methods/TimestampCalculation';
-import LocalStorageVariables from '../Methods/LocalStorageVariables';
 import SocialPost from './LikeButton';
 
 const PostEdit = (props) => {
     let post_desc = props.getHighlightedText ? props.getHighlightedText(props.post.post_desc) : props.post.post_desc;
     const [isEditing, setIsEditing] = useState(false);
     const [editComment, setEditComment] = useState(post_desc);
+    const [prevComment, setPrevComment] = useState(post_desc);
     const [commentEdited, setcommentEdited] = useState(props.post.editedPost);
 
     const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
-    const config = LocalStorageVariables("config");
     const userLikedPosts = props.getPostsData.userLikedPosts;
     const userComments = props.getPostsData.userComments;
 
-    const handleEditClick = (post) => {
+    const handleEditClick = () => {
         setIsEditing(true);
-        setEditComment(post.post_desc);
+        setEditComment(editComment);
     };
 
     const handleSave = async (postID) => {
         try {
-            const response = await fetch(`${backendDomain}/social/user-posts/`, {
+            const config = {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("access")}`,
+                    "Content-Type": "application/json"
+                }
+            };
+            const response = await fetch(`${backendDomain}/social/posts/`, {
                 method: 'PATCH',
                 headers: config["headers"],
                 body: JSON.stringify({ editedComment: editComment, postId: postID})
@@ -33,12 +38,14 @@ const PostEdit = (props) => {
             props.updateStatus({status: "danger", message: "Not able to update the comment, Try again later!"});
         }
         console.log('Saved:', editComment);
+        setEditComment(editComment);
+        setPrevComment(editComment);
         setIsEditing(false);
     };
 
-    const handleCancel = (post) => {
+    const handleCancel = () => {
         setIsEditing(false);
-        setEditComment(post.post_desc); // Reset to original
+        setEditComment(prevComment);
     };
     return (
         <>
@@ -69,9 +76,7 @@ const PostEdit = (props) => {
                         handleEditClick={handleEditClick}
                         setcommentEdited={setcommentEdited}
                     />
-                    <p className="post-text">
-                        {editComment}
-                    </p>
+                    <p className="post-text">{editComment}</p>
                     <div className="d-flex align-items-center">
                         <div className="flex-grow-1">
                             <div className="timestamp">
@@ -90,9 +95,7 @@ const PostEdit = (props) => {
                     </>
                 ) : (
                     <>
-                    <p className="post-text">
-                        {editComment}
-                    </p>
+                    <p className="post-text">{editComment}</p>
                     <SocialPost
                         userComments={userComments[props.post.id] ? userComments[props.post.id] : []}
                         userLiked={userLikedPosts.includes(props.post.id)}

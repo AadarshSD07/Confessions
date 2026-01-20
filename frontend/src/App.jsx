@@ -2,7 +2,6 @@ import {useState, useEffect} from 'react'
 import { jwtDecode } from 'jwt-decode';
 import axios from "axios";
 import Header from './Components/Header';
-import LocalStorageVariables from './Methods/LocalStorageVariables';
 import './CSS/App.css'
 
 const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
@@ -22,11 +21,11 @@ const isTokenValid = (token) => {
 const removeAccessRefresh = () => {
   localStorage.removeItem("access");
   localStorage.removeItem("refresh");
-}
+};
 
 const refreshAccessToken = async () => {
   try {
-    const refresh = LocalStorageVariables("refresh");
+    const refresh = localStorage.getItem("refresh");
     if (!refresh) return false;
     
     const response = await axios.post(`${backendDomain}/auth/refresh/`,
@@ -43,19 +42,16 @@ const refreshAccessToken = async () => {
     console.error('Error refreshing token:', err);
     return false;
   }
-}
-
-
+};
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const access = LocalStorageVariables("access");
-
   useEffect(() => {
     const checkAuth = async () => {
       // Check if tokens exist
+      const access = localStorage.getItem("access");
       if (localStorage.length === 0 || !localStorage.getItem("access", null)) {
         setIsAuthenticated(false);
         setLoading(false);

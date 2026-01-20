@@ -1,5 +1,4 @@
 import { useState } from "react";
-import LocalStorageVariables from "../Methods/LocalStorageVariables";
 import axios from "axios";
 
 export default function ChangePassword() {
@@ -11,7 +10,12 @@ export default function ChangePassword() {
     const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
     const Submit = async (e) => {
         e.preventDefault();
-        const config = LocalStorageVariables("config");
+        const config = {
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("access")}`,
+                "Content-Type": "application/json"
+            }
+        };
         try {
             const response = await axios.post(
                 `${backendDomain}/accounts/change-user-password/`,

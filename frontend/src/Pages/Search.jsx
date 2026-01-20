@@ -1,7 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
 import Posts from "./Posts";
-import LocalStorageVariables from "../Methods/LocalStorageVariables";
 
 const Search = () => {
     const [error, setError] = useState(null);
@@ -14,7 +13,6 @@ const Search = () => {
     const [totalResponsePosts, setTotalResponsePosts] = useState(0);
 
     const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
-    const config = LocalStorageVariables("config");
     const permissionToDelete = getPostsData.permissionToDelete ? getPostsData.permissionToDelete : false;
     const postEditingPermission = true;
 
@@ -33,6 +31,12 @@ const Search = () => {
         }
 
         try {
+            const config = {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("access")}`,
+                    "Content-Type": "application/json"
+                }
+            };
             const response = await axios.get(
                 `${backendDomain}/social/search/${searchLetter}/`,
                 config

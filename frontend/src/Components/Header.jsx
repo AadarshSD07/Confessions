@@ -4,7 +4,6 @@ import axios from "axios";
 import ChangePassword from "../Pages/ChangePassword";
 import CreatePosts from '../Pages/CreatePosts';
 import Dashboard from '../Pages/Dashboard';
-import LocalStorageVariables from '../Methods/LocalStorageVariables';
 import Login from '../Pages/Login';
 import Profile from '../Pages/Profile';
 import Register from '../Pages/Register';
@@ -135,16 +134,21 @@ export default function Header(props) {
     const [getHeaderDetails, setHeaderDetails] = useState([]);
 
     const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
-    const config = LocalStorageVariables("config");
 
     useEffect(() => {
         const userDetails = async () => {
-        try {
-            const response = await axios.get(`${backendDomain}/header/`, config);
-            setHeaderDetails(response.data);
-        } catch (err) {
-            console.error('Error:', err);
-        }
+            const config = {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("access")}`,
+                    "Content-Type": "application/json"
+                }
+            };
+            try {
+                const response = await axios.get(`${backendDomain}/header/`, config);
+                setHeaderDetails(response.data);
+            } catch (err) {
+                console.error('Error:', err);
+            }
         };
     
         userDetails();

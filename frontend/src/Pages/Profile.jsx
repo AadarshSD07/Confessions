@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import LocalStorageVariables from "../Methods/LocalStorageVariables";
 import axios from "axios";
 
 export default function Profile() {
@@ -17,7 +16,12 @@ export default function Profile() {
     const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
     useEffect(() => {
         const fetchUserDetails = async () => {
-            const config = LocalStorageVariables("config");
+            const config = {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("access")}`,
+                    "Content-Type": "application/json"
+                }
+            };
             try {
                 const response = await axios.get(
                     `${backendDomain}/accounts/user-details/`,
@@ -88,7 +92,12 @@ export default function Profile() {
             formData.append('imageUrl', []);
         }
 
-        const config = LocalStorageVariables("config");
+        const config = {
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("access")}`,
+                "Content-Type": "application/json"
+            }
+        };
         config["headers"]["Content-Type"] = "multipart/form-data";
 
         try {

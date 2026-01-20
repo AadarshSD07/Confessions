@@ -1,5 +1,4 @@
-import {useState, useEffect} from 'react'
-import LocalStorageVariables from '../Methods/LocalStorageVariables';
+import {useState, useEffect} from 'react';
 import Posts from "./Posts";
 import axios from 'axios';
 
@@ -12,12 +11,17 @@ export default function ViewPosts() {
 
   const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
   const backendUrl = `${backendDomain}/social/posts/?page=1&page_size=45`;
-  const config = LocalStorageVariables("config");
   const postEditingPermission = false;
-  const permissionToDelete = getPostsData.isUserAdmin;
+  const permissionToDelete = getPostsData.permissionToDelete;
 
   useEffect(() => {
     const fetchPosts = async () => {
+      const config = {
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("access")}`,
+            "Content-Type": "application/json"
+        }
+      };
       try {
         setLoading(true);
         const response = await axios.get(

@@ -1,18 +1,19 @@
-import {useState, useEffect} from 'react'
+import {useState, useEffect} from 'react';
 import axios from "axios";
 import { getTimeAgo } from '../Methods/TimestampCalculation';
-import LocalStorageVariables from "../Methods/LocalStorageVariables";
 import PostEdit from '../Components/PostEdit';
 import "../CSS/App.css"
 
 const Posts = (props) => {
   const [status, setStatus] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
+  // const [socialPosts , setSocialPosts] = useState(props.getPostsData.socialPosts);
 
   const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
-  const config = LocalStorageVariables("config");
-  let backendUrl = `${backendDomain}/social/posts/`;
-  let getPostsData = props.getPostsData;
+  const backendUrl = `${backendDomain}/social/posts/`;
+  const getPostsData = props.getPostsData;
+  const socialPosts = getPostsData.socialPosts;
+  const getHighlightedText = props.getHighlightedText ? props.getHighlightedText : false;
 
   const updateStatus = (data) => {
     setStatus(data.status);
@@ -21,36 +22,38 @@ const Posts = (props) => {
 
   const deletePost = async (e) => {
     e.preventDefault();
-    props.setError("");
+    const currentTargetButton = e.currentTarget;
+    currentTargetButton.disabled = true;
+    props.setError(null);
 
     try {
+      const config = {
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("access")}`,
+            "Content-Type": "application/json"
+        }
+      };
       const response = await axios.delete(backendUrl,
         {
-          data: {postId: e.currentTarget.id},
+          data: {postId: currentTargetButton.id},
           headers : config["headers"]
         }
       );
       if (response.status === 200){
-        const targetDiv = document.getElementById(`div-${e.target.parentNode.parentElement.id}`);
-        if (targetDiv) {
-          targetDiv.remove();
-        } else {
-          console.warn('Target div not found to remove the post in UI.');
-        }
-        updateStatus({status: "success", message: response.data.message});
+        window.location.reload();
+        // updateStatus({status: "success", message: response.data.message});
       } else {
         updateStatus({status: "danger", message: "Facing error while deleting the post: " + response.status});
+        currentTargetButton.disabled = false;
       }
     } catch (err) {
       props.setError(err);
+      e.currentTarget.disabled = false;
     }
   };
 
   if (props.loading) return <div>Loading posts...</div>;
   if (props.error) return <div>Error: {props.error}</div>;
-
-  const socialPosts = getPostsData.socialPosts;
-  const getHighlightedText = props.getHighlightedText ? props.getHighlightedText : false;
 
   return (
     <>

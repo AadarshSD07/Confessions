@@ -1,5 +1,4 @@
 import { useState, useRef } from "react";
-import LocalStorageVariables from "../Methods/LocalStorageVariables";
 import axios from "axios";
 
 export default function CreatePosts() {
@@ -41,7 +40,12 @@ export default function CreatePosts() {
 
   const Submit = async (e) => {
     e.preventDefault();
-    const config = LocalStorageVariables("config");
+    const config = {
+      headers: {
+          "Authorization": `Bearer ${localStorage.getItem("access")}`,
+          "Content-Type": "application/json"
+      }
+    };
     config["headers"]["Content-Type"] = "multipart/form-data";
 
     // Create FormData object
@@ -137,6 +141,7 @@ export default function CreatePosts() {
               onChange={(e) => setDesc(e.target.value)} // ✅ Lowercase 't'
               className="form-control shadow mt-3" 
               placeholder='Write something...'
+              required
             />
           <button type="submit" className="btn btn-primary px-5 mt-4 shadow">
             Post

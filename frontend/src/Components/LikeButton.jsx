@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from "axios";
 import { getTimeAgo } from '../Methods/TimestampCalculation';
-import LocalStorageVariables from '../Methods/LocalStorageVariables';
 import '../CSS/LikeButton.css';
 
 const SocialPost = (props) => {
@@ -14,10 +13,15 @@ const SocialPost = (props) => {
 
   let commentsLength = comments ? comments.length : 0;
   const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
-  const config = LocalStorageVariables("config");
 
   useEffect(() => {
     const fetchUserDetails = async () => {
+      const config = {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("access")}`,
+          "Content-Type": "application/json"
+        }
+      };
       try {
           const response = await axios.get(`${backendDomain}/header/`, config);
           setUserInformation(response.data);
@@ -30,6 +34,12 @@ const SocialPost = (props) => {
   }, []);
 
   const handleLike = async () => {
+    const config = {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("access")}`,
+        "Content-Type": "application/json"
+      }
+    };
     setLiked(!liked);
     setLikeCount(liked ? likeCount - 1 : likeCount + 1);
 
@@ -49,6 +59,13 @@ const SocialPost = (props) => {
 
   const handleCommentSubmit = (e) => {
     e.preventDefault();
+    const config = {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("access")}`,
+        "Content-Type": "application/json"
+      }
+    };
+
     if (!newComment.trim()) return;
     const comment = {
       id: commentsLength + 1,

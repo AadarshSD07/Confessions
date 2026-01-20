@@ -1,5 +1,4 @@
 import {useState, useEffect} from 'react'
-import LocalStorageVariables from '../Methods/LocalStorageVariables';
 import Posts from "./Posts";
 import axios from 'axios';
 
@@ -12,12 +11,17 @@ export default function Dashboard() {
 
   const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
   const backendUrl = `${backendDomain}/social/posts/?post_type=user&page=1&page_size=45`;
-  const config = LocalStorageVariables("config");
   const postEditingPermission = true;
-  const permissionToDelete = getPostsData.isUserAdmin;
+  const permissionToDelete = getPostsData.permissionToDelete;
 
   useEffect(() => {
     const fetchPosts = async () => {
+      const config = {
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("access")}`,
+            "Content-Type": "application/json"
+        }
+      };
       try {
         setLoading(true);
         const response = await axios.get(
@@ -41,9 +45,9 @@ export default function Dashboard() {
 
   return (
     <>
-    {/* <div className="profile-container w-100">
-    </div> */}
-    <h3 className='mt-4 fs-3 text-center'>Self Posts</h3>
+    <div className="profile-container w-100">
+      <h3 className='mt-4 fs-3 text-center'>Self Posts</h3>
+    </div>
     <Posts
       pageTitle={"dashboard"}
       postEditingPermission={postEditingPermission}
