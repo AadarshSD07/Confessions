@@ -314,6 +314,12 @@ height: calc(100% - 73px);
 
 
 @media (max-width: 450px) {
+
+  .avatar-profile {
+    height: 15rem;
+    width: 15rem;
+  }
+
   .h-custom {
   height: 100%;
   }

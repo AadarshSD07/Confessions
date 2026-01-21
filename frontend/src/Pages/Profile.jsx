@@ -47,7 +47,6 @@ export default function Profile() {
         fetchUserDetails();
     }, []);
 
-    // Handle image selection
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -61,12 +60,10 @@ export default function Profile() {
         }
     };
 
-    // Trigger file input click
     const handleAvatarClick = () => {
         fileInputRef.current.click();
     };
 
-    // Handle image removal
     const handleImageRemoval = () => {
         setImageFile(null);
         setImagePreview('');
@@ -75,16 +72,13 @@ export default function Profile() {
 
     const Submit = async (e) => {
         e.preventDefault();
-        // Create FormData object
         const formData = new FormData();
 
-        // Add text fields
         formData.append('username', username);
         formData.append('first_name', firstname);
         formData.append('last_name', lastname);
         formData.append('email', email);
 
-        // Add file if selected
         const fileInput = fileInputRef.current;
         if (fileInput.files.length > 0) {
             formData.append('imageUrl', fileInput.files[0]);
@@ -126,35 +120,31 @@ export default function Profile() {
 
     return (
         <>
-        <div className="w-25 container">
+        <div className="post-container p-3 shadow-lg field-width mt-4 pb-5">
             <form onSubmit={Submit}>
                 <div className="row">
                     <div className="col">
                         <div className="image-upload-container">
                             <div className="avatar-preview-container">
-                                {/* Default/Current Image */}
-                                <div className="relative group" onClick={handleAvatarClick}>
+                                <div className="relative group d-flex justify-content-center mx-auto" onClick={handleAvatarClick}>
                                     {imagePreview ? (
-                                        // Show selected image preview
                                         <img src={imagePreview} alt="Preview"
                                             className="avatar-profile w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg" />
                                     ) : imageUrl ? (
-                                        // Show backend image if available
                                         <img src={`${backendDomain}${imageUrl}`} alt="User"
                                             className="avatar-profile w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg" />
                                     ) : (
-                                        // Fallback if no image
                                         <div className="avatar-profile bg-gray-200 flex items-center justify-center cursor-pointer">
                                             <span className="text-gray-500">No Image</span>
                                         </div>
                                     )}
                                 </div>
 
-                                {/* Hidden file input */}
-                                <input id="user_image" type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden mt-4" />
+                                <div className="d-flex justify-content-center mx-auto">
+                                    <input id="user_image" type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden ps-2 mt-4" />
+                                </div>
                             </div>
 
-                            {/* Upload button (only show when image is selected) */}
                             {imageFile && (
                                 <div className="mt-4 space-x-2">
                                     <button onClick={handleImageRemoval}
@@ -164,8 +154,7 @@ export default function Profile() {
                                 </div>
                             )}
 
-                            {/* Help text */}
-                            <p className="text-sm text-gray-500 mt-2">
+                            <p className="text-sm text-gray-500 mt-2 d-flex justify-content-center mt-4 w-100 mx-auto">
                                 Click the image to upload a new profile picture
                             </p>
                         </div>

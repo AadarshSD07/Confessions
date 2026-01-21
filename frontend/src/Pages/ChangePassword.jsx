@@ -48,7 +48,7 @@ export default function ChangePassword() {
 
     return (
         <>
-        <div className="w-25">
+        <div className="post-container p-3 shadow-lg field-width mt-4 pb-5">
             <form onSubmit={Submit}>
             {statusMessage && (
                 <div className={`alert alert-${status}`} role="alert">
@@ -69,7 +69,7 @@ export default function ChangePassword() {
                 <input id="npassword" value={npassword} onChange={(e) => setNPassword(e.target.value)} className="form-control shadow-sm" 
                  type="password" placeholder="password" />
             </div>
-            <button type="submit" className="btn btn-primary px-5">
+            <button type="submit" className="btn btn-primary shadow px-5">
                 Change
             </button>
             </form>
