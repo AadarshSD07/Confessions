@@ -16,7 +16,6 @@ const getTimeAgoBoolean = (dateString) => {
   }
 }
 
-// Function to calculate time ago
 const getTimeAgo = (dateString) => {
   const date = new Date(dateString + 'Z');
   const now = new Date();
@@ -46,5 +45,4 @@ const getTimeAgo = (dateString) => {
   }
 };
 
-// export default getTimeAgo;
 export { getTimeAgoBoolean, getTimeAgo };

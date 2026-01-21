@@ -24,11 +24,31 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from SocialStack.views import HeaderDetails
 
 def show_urls(request):
+    """
+    Debug view to display all registered URL patterns in the Django project.
+    
+    WARNING: Only use in development for debugging URL configuration.
+    Exposes complete URL structure - never deploy to production.
+    
+    Args:
+        request: HTTP request object
+        
+    Returns:
+        HttpResponse: HTML list of all URL patterns (one per line)
+    """
+    from django.urls import get_resolver
+    
+    # Get root URL resolver containing all registered URL patterns
     resolver = get_resolver()
     urls = []
+    
+    # Extract string representation of each URL pattern
     for pattern in resolver.url_patterns:
         urls.append(str(pattern))
+    
+    # Return simple HTML with line breaks between patterns
     return HttpResponse('<br>'.join(urls))
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),

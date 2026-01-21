@@ -88,7 +88,7 @@ const PostEdit = (props) => {
                         </div>
                         { commentEdited ? 
                             <figcaption  className='blockquote-footer'><em>edited</em></figcaption>
-                          : 
+                          :
                             ""
                         }
                     </div>

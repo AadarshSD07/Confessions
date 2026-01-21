@@ -141,7 +141,6 @@ const NavbarWithRouter = (props) => {
 
 export default function Header(props) {
     const [getHeaderDetails, setHeaderDetails] = useState([]);
-
     const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
 
     useEffect(() => {
@@ -159,7 +158,7 @@ export default function Header(props) {
                 console.error('Error:', err);
             }
         };
-    
+
         userDetails();
     }, []);
 

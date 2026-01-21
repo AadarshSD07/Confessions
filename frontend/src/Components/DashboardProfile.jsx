@@ -15,7 +15,7 @@ const DashboardProfile = (props) => {
               <div className="d-flex align-items-center">
                 <h2 className="mb-0 fw-bold truncate-text">{props.userInfo.fullName}</h2>
               </div>
-              
+
               <div className="dashboard-username truncate-text">@{props.userInfo.username}</div>
 
               <div className='pt-5'>

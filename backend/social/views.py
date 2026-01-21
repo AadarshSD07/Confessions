@@ -1,8 +1,8 @@
 from accounts.models import User
 from collections import defaultdict
 from configuration import Config
-from django.db.models.functions import Cast, Coalesce
-from django.db.models import Count, CharField, Value, Case, When, BooleanField, Q
+from django.db.models.functions import Coalesce
+from django.db.models import Count, Value, Case, When, BooleanField, Q
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions, generics
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -10,8 +10,6 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from social import serializers, models
-
-import json
 
 class CustomPostPagination(PageNumberPagination):
     """
@@ -60,7 +58,7 @@ class SocialPostsAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = CustomPostPagination
-    
+
     def get_public_posts_queryset(self, search=None):
         """
         Get base queryset with annotations for likes, user comparison
@@ -76,9 +74,9 @@ class SocialPostsAPIView(APIView):
                 output_field=BooleanField()
             )
         ).select_related('user').prefetch_related('comments__user', 'likes')
-        
+
         return base_queryset.filter(post_desc__icontains=search) if search else base_queryset
-    
+
     def get_user_dashboard_queryset(self):
         """
         Get queryset filtered to current user's posts with annotations
@@ -281,40 +279,40 @@ class SocialPostsAPIView(APIView):
             },
             status=Config.bad_request
         )
-    
+
     def patch(self, request):
         """
         Update an existing post (edit post description)
-        
+
         Args:
             request: HTTP request object
-        
+
         Request Body:
             {
                 "postId": int (required) - ID of the post to update
                 "editedComment": string (required) - New post description
             }
-        
+
         Returns:
             Response: Success/failure message
-        
+
         Status Codes:
             200 OK: Post updated successfully
             204 No Content: Post not found or user is not the owner
             400 Bad Request: Invalid data provided
             401 Unauthorized: User not authenticated
-        
+
         Notes:
             - Users can only update their own posts
             - Sets editedPost flag to True automatically
-        
+
         Example:
             PATCH /api/user/posts/
             Body: {
                 "postId": 123,
                 "editedComment": "Updated post description"
             }
-            
+
             Response:
             {
                 "message": "Post updated successfully!",
@@ -327,7 +325,7 @@ class SocialPostsAPIView(APIView):
         """
         # Validate request data
         serializer = serializers.UpdatePostSerializer(data=request.data)
-        
+
         if not serializer.is_valid():
             return Response(
                 {
@@ -336,11 +334,11 @@ class SocialPostsAPIView(APIView):
                 },
                 status=Config.bad_request
             )
-        
+
         validated_data = serializer.validated_data
         post_id = validated_data['postId']
         edited_comment = validated_data['editedComment']
-        
+
         # Check if post exists and belongs to user
         try:
             post = models.UserPost.objects.get(
@@ -352,12 +350,12 @@ class SocialPostsAPIView(APIView):
                 {"message": "No post found for requested user!"},
                 status=Config.no_content
             )
-        
+
         # Update post
         post.post_desc = edited_comment
         post.editedPost = True
         post.save()
-        
+
         return Response(
             {
                 "message": "Post updated successfully!",
@@ -374,27 +372,27 @@ class SocialPostsAPIView(APIView):
     def delete(self, request):
         """
         Delete a social post (admin only)
-        
+
         Args:
             request: HTTP request object containing post ID in request body
-        
+
         Request Body:
             {
                 "postId": int - ID of the post to delete
             }
-        
+
         Returns:
             Response: Success/failure message
-        
+
         Status Codes:
             200 OK: Post deleted successfully
             204 No Content: Post not found
             400 Bad Request: Missing postId in request
             401 Unauthorized: User is not an admin
-        
+
         Permissions:
             - Only users with 'admin' role can delete posts
-        
+
         Example:
             DELETE /api/posts/
             Body: {"postId": 123}
@@ -430,37 +428,106 @@ class SocialPostsAPIView(APIView):
 
 
 class UserDashboard(APIView):
+    """
+    API endpoint to fetch dashboard posts for a specific user.
+    
+    Delegates to SocialPostsAPIView with modified query parameters to
+    retrieve dashboard-specific posts for the target user ID.
+    
+    Authentication: JWT required
+    Permissions: Authenticated users only
+    
+    URL Parameters:
+        id (int): Target user ID for dashboard posts
+        
+    Returns:
+        Response: Paginated dashboard posts from SocialPostsAPIView
+    """
     authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, id):
+        """
+        Handle GET request to retrieve user dashboard posts.
+        
+        Modifies request query parameters and forwards to SocialPostsAPIView
+        for consistent post retrieval logic.
+        
+        Args:
+            request: HTTP request with authentication context
+            id (int): User ID for dashboard posts
+            
+        Returns:
+            Response: Dashboard posts response from SocialPostsAPIView
+        """
+        # Initialize SocialPostsAPIView instance and assign current request
         social_posts_view = SocialPostsAPIView()
         social_posts_view.request = self.request
 
+        # Modify query parameters for dashboard-specific filtering
         query_params = self.request._request.GET.copy()
-        query_params['post_type'] = 'dashboard'
-        query_params['page'] = '1'
-        query_params['page_size'] = '45'
-        query_params['user_id'] = id
+        query_params['post_type'] = 'dashboard'      # Dashboard post type
+        query_params['page'] = '1'                   # First page
+        query_params['page_size'] = '45'             # 45 posts per page
+        query_params['user_id'] = id                 # Target user ID
 
+        # Update request query parameters for delegated view
         self.request._request.GET = query_params
 
+        # Delegate to SocialPostsAPIView for actual data retrieval
         return social_posts_view.get(self.request)
 
 
 class PostsLike(APIView):
+    """
+    API endpoint to like or unlike a user post.
+
+    Handles toggle functionality for post likes based on authenticated user.
+    Adds user to post's likes ManyToMany field when liked=true,
+    removes when liked=false.
+
+    Authentication: JWT required
+    Permissions: Authenticated users only
+
+    Request Body:
+        liked (bool): true to like, false to unlike the post
+
+    URL Parameters:
+        id (int): Post ID to like/unlike
+
+    Returns:
+        Response: 200 Success (no content body)
+    """
     authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     queryset = models.UserPost.objects.all()
 
     def post(self, request, id):
+        """
+        Handle POST request to like or unlike a specific post.
+
+        Args:
+            request: HTTP request with post_data and authenticated user
+            id (int): ID of the UserPost to modify
+
+        Returns:
+            Response: HTTP 200 success status
+        """
         post_data = request.data
-        post = self.queryset.filter(id = id).first()
-        if post_data["liked"]:
-            post.likes.add(request.user)
+        post = self.queryset.filter(id=id).first()
+
+        # Validate post exists before processing
+        if not post:
+            return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Toggle like status based on request data
+        if post_data.get("liked", False):
+            post.likes.add(request.user)  # Add user to likes
         else:
-            post.likes.remove(request.user)
-        post.save()
+            post.likes.remove(request.user)  # Remove user from likes
+
+        post.save()  # Persist changes to database
+
         return Response(status=Config.success)
 
 
@@ -511,18 +578,55 @@ class PostsComment(APIView):
 
 
 class SearchUsersPosts(generics.ListAPIView):
+    """
+    API endpoint to search for users and their posts simultaneously based on search text.
+
+    Searches users by username, first_name, or last_name, and fetches their posts
+    using the SocialPostsAPIView logic with modified query parameters.
+    
+    Authentication: JWT required
+    Permissions: Authenticated users only
+    
+    Query Parameters:
+        search_text (str): Text to search in users and posts
+        
+    Returns:
+        dict: {
+            "users": List[dict] - Matching users with basic profile data,
+            "posts": List[dict] - Posts matching search criteria (paginated)
+        }
+    """
     authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = serializers.SearchUsersPostsSerializer
     queryset = User.objects.all()
 
     def get(self, request, search_text):
+        """
+        Handle GET request to search users and posts.
+
+        Args:
+            request: HTTP request object
+            search_text (str): Search query string
+
+        Returns:
+            Response: Serialized search results with success status
+        """
         serializer = self.get_serializer(data=self.get_queryset_data(search_text))
         serializer.is_valid(raise_exception=True)
         return Response(serializer.validated_data, status=Config.success)
 
     def get_queryset_data(self, search_text):
-        # Get users matching search text
+        """
+        Fetch and combine users and posts data for the given search text.
+
+        Args:
+            search_text (str): Search query to match users and posts
+
+        Returns:
+            dict: Combined data structure with users and posts lists
+        """
+        # Search users by username, first name, or last name (case-insensitive)
         users = list(
             self.queryset.filter(
                 Q(username__icontains=search_text) |
@@ -537,25 +641,26 @@ class SearchUsersPosts(generics.ListAPIView):
             )
         )
 
-        # Call SocialPostsAPIView directly with modified request
+        # Initialize SocialPostsAPIView instance for posts search
         social_posts_view = SocialPostsAPIView()
         social_posts_view.request = self.request
 
-        # Copy and modify query params
+        # Modify query parameters for posts search
+        # Clear post_type, set pagination, and apply search text
         query_params = self.request._request.GET.copy()
         query_params['post_type'] = ''
         query_params['page'] = '1'
         query_params['page_size'] = '45'
         query_params['search'] = search_text
 
+        # Update request query params for posts view
         self.request._request.GET = query_params
 
-        # Call get() method directly
+        # Execute posts search and extract paginated results
         posts_response = social_posts_view.get(self.request)
-
-        # Extract paginated data
         posts = posts_response.data["results"]
 
+        # Combine users and posts data
         data = {
             "users": users,
             "posts": posts

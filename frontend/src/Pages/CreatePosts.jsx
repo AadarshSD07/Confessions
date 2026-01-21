@@ -8,11 +8,9 @@ export default function CreatePosts() {
   const [imageUrl, setImageUrl] = useState("");
   const [status, setStatus] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
-
   const fileInputRef = useRef(null);
   const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
 
-  // Handle image selection
   const handleImageChange = (e) => {
       const file = e.target.files[0];
       if (file) {
@@ -26,12 +24,10 @@ export default function CreatePosts() {
       }
   };
 
-  // Trigger file input click
   const handleAvatarClick = () => {
       fileInputRef.current.click();
   };
 
-  // Handle image removal
   const handleImageRemoval = () => {
       setImageFile(null);
       setImagePreview('');
@@ -48,13 +44,10 @@ export default function CreatePosts() {
     };
     config["headers"]["Content-Type"] = "multipart/form-data";
 
-    // Create FormData object
     const formData = new FormData();
 
-    // Add text fields
     formData.append('desc', desc);
 
-    // Add file if selected
     const fileInput = fileInputRef.current;
     if (fileInput.files.length > 0) {
         formData.append('imageUrl', fileInput.files[0]);
@@ -98,33 +91,26 @@ export default function CreatePosts() {
 
             <div className="image-upload-container">
               <div className="avatar-preview-container">
-                  {/* Default/Current Image postImageContainer */}
                     {imagePreview ? (
-                        // Show selected image preview
                         <div className="postImageContainer" onClick={handleAvatarClick}>
                           <img src={imagePreview} alt="Preview"
                               className="postImage me-3" />
                         </div>
                     ) : imageUrl ? (
-                        // Show backend image if available
                         <div className="postImageContainer" onClick={handleAvatarClick}>
                           <img src={`${backendDomain}${imageUrl}`} alt="User"
                               className="postImage me-3" />
                         </div>
                     ) : (
-                        // Fallback if no image
                         <span></span>
                     )}
 
-                  {/* Hidden file input */}
                   <input id="user_image" type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
-                  {/* Help text */}
                   <p className="text-sm text-gray-500 mt-2">
                       Click the image to upload a new profile picture
                   </p>
               </div>
 
-              {/* Cancel button (only show when image is selected) */}
               {imageFile && (
                   <div className="mt-4 space-x-2">
                       <button onClick={handleImageRemoval}
@@ -137,8 +123,8 @@ export default function CreatePosts() {
 
             <textarea 
               id="desc" 
-              value={desc} // ✅ Using lowercase 't'
-              onChange={(e) => setDesc(e.target.value)} // ✅ Lowercase 't'
+              value={desc}
+              onChange={(e) => setDesc(e.target.value)}
               className="form-control shadow mt-3" 
               placeholder='Write something...'
               required

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from "axios";
 import { getTimeAgo } from '../Methods/TimestampCalculation';
+import axios from "axios";
 import '../CSS/LikeButton.css';
 
 const SocialPost = (props) => {
@@ -43,7 +43,6 @@ const SocialPost = (props) => {
     setLiked(!liked);
     setLikeCount(liked ? likeCount - 1 : likeCount + 1);
 
-    // API call to Django backend
     try {
       const response = await fetch(`${backendDomain}/social/like/${props.post.id}/`, {
         method: 'POST',
@@ -51,7 +50,6 @@ const SocialPost = (props) => {
         body: JSON.stringify({ liked: !liked })
       });
       const data = await response.json();
-      // Handle response if needed
     } catch (error) {
       console.error('Error liking post:', error);
     }
@@ -79,7 +77,6 @@ const SocialPost = (props) => {
     setNewComment('');
     props.setcommentEdited(true);
 
-    // API call to Django backend
     fetch(`${backendDomain}/social/comment/${props.post.id}/`, {
       method: 'POST',
       headers: config["headers"],
