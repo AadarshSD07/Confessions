@@ -144,7 +144,7 @@ const Posts = (props) => {
         )) )
       }
       {
-        pagination ?
+        pagination && pagination.total_pages > 1 ?
           <nav aria-label="Page navigation example" className="d-flex justify-content-center mt-5">
             <ul className="pagination">
               <li className="page-item">
