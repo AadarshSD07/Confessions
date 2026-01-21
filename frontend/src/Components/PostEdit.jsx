@@ -10,8 +10,8 @@ const PostEdit = (props) => {
     const [commentEdited, setcommentEdited] = useState(props.post.editedPost);
 
     const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
-    const userLikedPosts = props.getPostsData.userLikedPosts;
-    const userComments = props.getPostsData.userComments;
+    const userLikedPosts = props.paginatedDataResults.userLikedPosts;
+    const userComments = props.paginatedDataResults.userComments;
 
     const handleEditClick = () => {
         setIsEditing(true);

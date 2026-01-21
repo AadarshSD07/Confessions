@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { BrowserRouter, Routes, Route, Link, useNavigate, useLocation} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import Posts from "./Posts";
-import Profile from "./Profile";
 
 const Search = () => {
     const [error, setError] = useState(null);
@@ -15,7 +14,6 @@ const Search = () => {
     const [totalResponsePosts, setTotalResponsePosts] = useState(0);
 
     const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
-    const permissionToDelete = getPostsData.permissionToDelete ? getPostsData.permissionToDelete : false;
     const postEditingPermission = true;
 
     const handleSubmit = async (e) => {
@@ -44,11 +42,12 @@ const Search = () => {
                 config
             );
             if (response.status === 200){
+                debugger
                 setTotalResponseUsers(response.data.users.length);
-                setTotalResponsePosts(response.data.posts.socialPosts.length);
+                setTotalResponsePosts(response.data.posts.count);
                 setSearchedUsers(response.data.users);
                 setGetPostsData(response.data.posts);
-                setSocialPosts(response.data.posts.socialPosts);
+                setSocialPosts(response.data.posts.results.socialPosts);
             }
 
         } catch (err) {
@@ -154,14 +153,14 @@ const Search = () => {
                     <Posts
                         pageTitle={"dashboard"}
                         postEditingPermission={postEditingPermission}
-                        getPostsData={getPostsData}
-                        permissionToDelete={permissionToDelete}
+                        paginatedDataResults={getPostsData.results}
+                        permissionToDelete={getPostsData.results.permissionToDelete}
                         loading={loading}
                         setLoading={setLoading}
                         error={error}
                         setError={setError}
                         getHighlightedText={getHighlightedText}
-                        pagination={[null, null]}
+                        pagination={null}
                     />
                 )
             }

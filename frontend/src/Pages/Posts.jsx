@@ -7,12 +7,11 @@ import "../CSS/App.css"
 const Posts = (props) => {
   const [status, setStatus] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
-  // const [socialPosts , setSocialPosts] = useState(props.getPostsData.socialPosts);
+  const [pagination, setPagination] = useState(props.pagination || null);
+  const [socialPosts, setSocialPosts] = useState(props.paginatedDataResults?.socialPosts || []);
 
   const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
   const backendUrl = `${backendDomain}/social/posts/`;
-  const getPostsData = props.getPostsData;
-  const socialPosts = getPostsData.socialPosts;
   const getHighlightedText = props.getHighlightedText ? props.getHighlightedText : false;
 
   const updateStatus = (data) => {
@@ -52,8 +51,27 @@ const Posts = (props) => {
     }
   };
 
-  if (props.loading) return <div>Loading posts...</div>;
-  if (props.error) return <div>Error: {props.error}</div>;
+  const PageData = async (url) => {
+    setSocialPosts([]);
+    setPagination([]);
+    const config = {
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("access")}`,
+            "Content-Type": "application/json"
+        }
+      };
+    try {
+      const response = await axios.get(
+        url,
+        config
+      );
+      setSocialPosts(response.data.results.socialPosts);
+      setPagination(response.data);
+
+    } catch (err) {
+      console.log("Error with request " + err);
+    }
+  };
 
   return (
     <>
@@ -117,7 +135,7 @@ const Posts = (props) => {
                   post={post}
                   postEditingPermission={props.postEditingPermission}
                   updateStatus={updateStatus}
-                  getPostsData={props.getPostsData}
+                  paginatedDataResults={props.paginatedDataResults}
                   getHighlightedText={getHighlightedText}
                   postTimeline={getTimeAgo(post.created_at_str)}
                 />
@@ -125,22 +143,68 @@ const Posts = (props) => {
             </div>
         )) )
       }
-      {/* <nav aria-label="Page navigation example" className="d-flex justify-content-center mt-5">
-        <ul className="pagination">
-          {
-            props.pagination[0] ?
-              <li className="page-item"><a className="page-link" href={props.pagination[0]}>Previous</a></li>
-            :
-              <li className="page-item"><a className="page-link" href="#" disabled>Previous</a></li>
-          }
-          {
-            props.pagination[1] ?
-              <li className="page-item"><a className="page-link" href={props.pagination[1]}>Next</a></li>
-            :
-              <li className="page-item"><a className="page-link" href="#" disabled>Next</a></li>
-          }
-        </ul>
-      </nav> */}
+      {
+        pagination ?
+          <nav aria-label="Page navigation example" className="d-flex justify-content-center mt-5">
+            <ul className="pagination">
+              <li className="page-item">
+                <a className={`page-link ${!pagination.previous ? "disabledButton" : ""}`}
+                  href="#"
+                  onClick={(e) => {
+                      if (!pagination.previous) {
+                        e.preventDefault();
+                        return false;
+                      }
+                      PageData(pagination.previous);
+                    }}
+                >
+                  Previous
+                </a>
+              </li>
+              {
+                pagination.pages && pagination.pages.length > 2 ? (
+                  pagination.pages.map((item, index) => (
+                    <li key={index} className="page-item">
+                      <a
+                        className={`page-link ${item.is_current ? "disabledButton" : ""}`}
+                        href="#"
+                        aria-current={item.is_current ? "page" : undefined}
+                        disabled={item.is_current}
+                        onClick={(e) => {
+                          if (item.is_current) {
+                            e.preventDefault();
+                            return false;
+                          }
+                          PageData(item.url);
+                        }}
+                      >
+                        {item.page}
+                      </a>
+                    </li>
+                  ))
+                ) : (
+                  ""
+                )
+              }
+              <li className="page-item">
+                <a className={`page-link ${!pagination.next ? "disabledButton" : ""}`}
+                  href="#"
+                  onClick={(e) => {
+                      if (!pagination.next) {
+                        e.preventDefault();
+                        return false;
+                      }
+                      PageData(pagination.next);
+                    }}
+                >
+                  Next
+                </a>
+              </li>
+            </ul>
+          </nav>
+        :
+          ""
+      }
     </div>
     </>
   )

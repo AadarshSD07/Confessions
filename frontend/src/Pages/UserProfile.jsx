@@ -4,18 +4,16 @@ import DashboardProfile from '../Components/DashboardProfile';
 import Posts from "./Posts";
 
 export default function UserProfile() {
-  const [getPostsData, setGetPostsData] = useState({});
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [prevUrl, setPrevUrl] = useState("");
-  const [nextUrl, setNextUrl] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [paginatedData, setPaginatedData] = useState("");
   const [userInfo, setUserInfo] = useState({});
 
   const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
+  const postsPerPage = import.meta.env.VITE_POSTS_PER_PAGE;
   let userDashboard = window.location.pathname.replace("/dashboard/", "");
-  let backendUrl = `${backendDomain}/social/dashboard/${userDashboard}/`;
+  const backendUrl = `${backendDomain}/social/dashboard/${userDashboard}/?post_type=dashboard&page=1&page_size=${postsPerPage}`;
   const postEditingPermission = true;
-  const permissionToDelete = getPostsData ? getPostsData.permissionToDelete : false;
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -31,10 +29,8 @@ export default function UserProfile() {
           backendUrl,
           config
         );
-        setGetPostsData(response.data);
+        setPaginatedData(response.data);
         setUserInfo(response.data.results.userDashboardInformation);
-        setPrevUrl(response.data.previous ? response.data.previous : "");
-        setNextUrl(response.data.next ? response.data.next : "");
         setError(null);
       } catch (err) {
         setError(err.message);
@@ -47,25 +43,26 @@ export default function UserProfile() {
     fetchPosts();
   }, []);
 
-  if (loading || !getPostsData) return <div>Loading posts...</div>;
+  if (loading || !paginatedData) return <div>Loading posts...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <>
     <DashboardProfile
         userInfo={userInfo}
         backendDomain={backendDomain}
-        getPostsData={getPostsData}
+        postsCount={paginatedData.count}
     />
     <Posts
       pageTitle={"dashboard"}
       postEditingPermission={postEditingPermission}
-      getPostsData={getPostsData.results}
-      permissionToDelete={permissionToDelete}
+      paginatedDataResults={paginatedData.results}
+      permissionToDelete={paginatedData.results.permissionToDelete}
       loading={loading}
       setLoading={setLoading}
       error={error}
       setError={setError}
-      pagination={[prevUrl, nextUrl]}
+      pagination={paginatedData}
     />
     </>
   )

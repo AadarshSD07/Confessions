@@ -13,7 +13,9 @@ class Config:
     forbidden = status.HTTP_403_FORBIDDEN
     bad_request = status.HTTP_400_BAD_REQUEST
     created = status.HTTP_201_CREATED
+    not_found = status.HTTP_404_NOT_FOUND
 
     database_url = os.getenv('DATABASE_URL')
     api_key = os.getenv('API_KEY')
     debug_mode = os.getenv('DEBUG', 'False') == 'True'
+    posts_per_page = os.getenv('POSTS_PER_PAGE', '50')

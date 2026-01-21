@@ -300,6 +300,21 @@ height: calc(100% - 73px);
   font-weight: bold;
 }
 
+.disabledButton {
+  background-color: #0d6efd;
+  color: white;
+}
+
+.disabledButton:hover {
+  color: white;
+  background-color: #0c58c2;
+}
+
+.disabledButton:focus {
+  color: white;
+  background-color: #0c58c2;
+}
+
 @media (max-width: 450px) {
   .truncate-text {
     display: inline-block;
@@ -314,7 +329,6 @@ height: calc(100% - 73px);
 
 
 @media (max-width: 450px) {
-
   .avatar-profile {
     height: 15rem;
     width: 15rem;

@@ -1,5 +1,5 @@
 from accounts.models import User
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from configuration import Config
 from django.db.models.functions import Coalesce
 from django.db.models import Count, Value, Case, When, BooleanField, Q
@@ -30,7 +30,45 @@ class CustomPostPagination(PageNumberPagination):
     """
     page_size = 10
     page_size_query_param = 'page_size'
-    max_page_size = 50
+    max_page_size = int(Config.posts_per_page)
+
+    def get_paginated_response(self, data):
+        # Get total pages
+        total_pages = self.page.paginator.num_pages
+        current_page = self.page.number
+
+        # Build URLs for all pages
+        page_urls = []
+        for page_num in range(1, total_pages + 1):
+            # Replace or add page parameter in current URL
+            url = self.request.build_absolute_uri()
+
+            # Handle URL construction based on existing query params
+            if '?' in url:
+                base_url = url.split('?')[0]
+                # Remove existing page parameter if present
+                query_params = self.request.GET.copy()
+                query_params['page'] = page_num
+                page_url = f"{base_url}?{query_params.urlencode()}"
+            else:
+                page_url = f"{url}?page={page_num}"
+
+            page_urls.append({
+                'page': page_num,
+                'url': page_url,
+                'is_current': page_num == current_page
+            })
+
+        return Response(OrderedDict([
+            ('count', self.page.paginator.count),
+            ('total_pages', total_pages),
+            ('current_page', current_page),
+            ('page_size', self.page_size),
+            ('next', self.get_next_link()),
+            ('previous', self.get_previous_link()),
+            ('pages', page_urls),
+            ('results', data)
+        ]))
 
 
 class SocialPostsAPIView(APIView):
@@ -208,6 +246,10 @@ class SocialPostsAPIView(APIView):
             response_data["userDashboardInformation"] = self.get_dashboard_information()
         else:
             response_data["permissionToDelete"] = request.user.get_user_role() == "admin"
+
+        # Search page does not has pagination mechanism
+        if search:
+            return response_data
 
         # Return paginated response
         return paginator.get_paginated_response(response_data)
@@ -466,10 +508,10 @@ class UserDashboard(APIView):
 
         # Modify query parameters for dashboard-specific filtering
         query_params = self.request._request.GET.copy()
-        query_params['post_type'] = 'dashboard'      # Dashboard post type
-        query_params['page'] = '1'                   # First page
-        query_params['page_size'] = '45'             # 45 posts per page
-        query_params['user_id'] = id                 # Target user ID
+        query_params['post_type'] = request.query_params["post_type"]                                   # Dashboard post type
+        query_params['page'] = request.query_params.get("page", 1)                                      # Page number
+        query_params['page_size'] = request.query_params.get("page_size", Config.posts_per_page)        # 3 posts per page
+        query_params['user_id'] = id                                                                    # Target user ID
 
         # Update request query parameters for delegated view
         self.request._request.GET = query_params
@@ -518,7 +560,7 @@ class PostsLike(APIView):
 
         # Validate post exists before processing
         if not post:
-            return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Post not found"}, status=Config.not_found)
 
         # Toggle like status based on request data
         if post_data.get("liked", False):
@@ -650,7 +692,7 @@ class SearchUsersPosts(generics.ListAPIView):
         query_params = self.request._request.GET.copy()
         query_params['post_type'] = ''
         query_params['page'] = '1'
-        query_params['page_size'] = '45'
+        query_params['page_size'] = '2'
         query_params['search'] = search_text
 
         # Update request query params for posts view
@@ -658,7 +700,7 @@ class SearchUsersPosts(generics.ListAPIView):
 
         # Execute posts search and extract paginated results
         posts_response = social_posts_view.get(self.request)
-        posts = posts_response.data["results"]
+        posts = posts_response.data
 
         # Combine users and posts data
         data = {

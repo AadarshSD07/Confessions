@@ -20,7 +20,7 @@ const DashboardProfile = (props) => {
 
               <div className='pt-5'>
                 <div className='fs-5 fw-bold'>Posts</div>
-                <div>{props.getPostsData.count}</div>
+                <div>{props.postsCount}</div>
               </div>
 
             </div>

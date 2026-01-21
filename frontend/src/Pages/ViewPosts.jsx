@@ -2,17 +2,18 @@ import {useState, useEffect} from 'react';
 import Posts from "./Posts";
 import axios from 'axios';
 
+
 export default function ViewPosts() {
-  const [getPostsData, setGetPostsData] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [prevUrl, setPrevUrl] = useState("");
-  const [nextUrl, setNextUrl] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [paginatedData, setPaginatedData] = useState("");
+
 
   const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
-  const backendUrl = `${backendDomain}/social/posts/?page=1&page_size=45`;
+  const postsPerPage = import.meta.env.VITE_POSTS_PER_PAGE;
+
+  const backendUrl = `${backendDomain}/social/posts/?page=1&page_size=${postsPerPage}`;
   const postEditingPermission = false;
-  const permissionToDelete = getPostsData.permissionToDelete;
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -28,9 +29,8 @@ export default function ViewPosts() {
           backendUrl,
           config
         );
-        setGetPostsData(response.data.results);
-        setPrevUrl(response.data.previous ? response.data.previous : "");
-        setNextUrl(response.data.next ? response.data.next : "");
+        setPaginatedData(response.data);
+
         setError(null);
       } catch (err) {
         setError(err.message);
@@ -43,19 +43,26 @@ export default function ViewPosts() {
     fetchPosts();
   }, []);
 
+  if (loading || !paginatedData) return <div>Loading posts...</div>;
+  if (error) return <div>Error: {error}</div>;
+
   return (
     <>
+
+
     <h3 className='mt-4 fs-3 text-center'>All Posts</h3>
+
+
     <Posts
       pageTitle={"viewposts"}
       postEditingPermission={postEditingPermission}
-      getPostsData={getPostsData}
-      permissionToDelete={permissionToDelete}
+      paginatedDataResults={paginatedData.results}
+      permissionToDelete={paginatedData.results.permissionToDelete}
       loading={loading}
       setLoading={setLoading}
       error={error}
       setError={setError}
-      pagination={[prevUrl, nextUrl]}
+      pagination={paginatedData}
     />
     </>
   )
