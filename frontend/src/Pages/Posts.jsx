@@ -10,7 +10,6 @@ const Posts = (props) => {
   const [statusMessage, setStatusMessage] = useState("");
   const [pagination, setPagination] = useState(props.pagination || null);
   const [socialPosts, setSocialPosts] = useState(props.paginatedDataResults?.socialPosts || []);
-  const [userProfileView, setUserProfileView] = useState(props.userProfileView);
 
   const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
   const backendUrl = `${backendDomain}/social/posts/`;
@@ -67,8 +66,12 @@ const Posts = (props) => {
         url,
         config
       );
-      setSocialPosts(response.data.results.socialPosts);
-      setPagination(response.data);
+      let responseData = response.data;
+      let searchPage = !getHighlightedText === false;
+      let paginatedData = searchPage ? responseData.posts : responseData;
+
+      setPagination(paginatedData);
+      setSocialPosts(paginatedData.results.socialPosts);
 
     } catch (err) {
       console.log("Error with request " + err);

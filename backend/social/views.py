@@ -247,10 +247,6 @@ class SocialPostsAPIView(APIView):
         else:
             response_data["permissionToDelete"] = request.user.get_user_role() == "admin"
 
-        # Search page does not has pagination mechanism
-        if search:
-            return response_data
-
         # Return paginated response
         return paginator.get_paginated_response(response_data)
 
@@ -680,7 +676,7 @@ class SearchUsersPosts(generics.ListAPIView):
                 "last_name",
                 "username",
                 "profile_image"
-            )
+            )[:10]     # ✅ Limits to first 100 matching users
         )
 
         # Initialize SocialPostsAPIView instance for posts search
@@ -691,8 +687,8 @@ class SearchUsersPosts(generics.ListAPIView):
         # Clear post_type, set pagination, and apply search text
         query_params = self.request._request.GET.copy()
         query_params['post_type'] = ''
-        query_params['page'] = '1'
-        query_params['page_size'] = '2'
+        query_params['page'] = self.request.query_params.get("page", 1)
+        query_params['page_size'] = self.request.query_params.get("page_size", Config.posts_per_page)
         query_params['search'] = search_text
 
         # Update request query params for posts view

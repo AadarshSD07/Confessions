@@ -4,30 +4,53 @@ import axios from "axios";
 import Posts from "./Posts";
 
 const Search = () => {
-    const [error, setError] = useState(null);
-    const [getPostsData, setGetPostsData] = useState([]);
+    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-    const [socialPosts, setSocialPosts] = useState([]);
+    const [paginatedData, setPaginatedData] = useState([]);
     const [searchText, setSearchText] = useState("");
     const [searchedUsers, setSearchedUsers] = useState([]);
-    const [totalResponseUsers, setTotalResponseUsers] = useState(0);
-    const [totalResponsePosts, setTotalResponsePosts] = useState(0);
 
     const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
+    const postsPerPage = import.meta.env.VITE_POSTS_PER_PAGE;
     const postEditingPermission = true;
+
+    // Regex patterns to BLOCK (common malicious patterns)
+    const BLOCKED_PATTERNS = [
+        // ✅ BLOCKS: Numbers (123, asd123)
+        /\d/,
+        // ✅ BLOCKS: ALL special characters (!@#$%^&*()=-+][{}\|:;'"<>?/.)
+        /[!@#$%^&*()_=\[\]{}|\\:;"'<>?\/.,~`+-]/,
+        // ✅ Simple: Any non-alphabet character
+        /[^a-zA-Z]/
+    ];
+
+    const isRegexPattern = (text) => {
+        return BLOCKED_PATTERNS.some(pattern => pattern.test(text));
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (isRegexPattern(e.target.value)) {
+            e.preventDefault();
+            setError('❌ Regex patterns are not allowed (/, *, numbers only, etc.)');
+            return;
+        }
         return await Submit(e)
     }
 
     const Submit = async (e) => {
-        let searchLetter = e.target.value
-        setSocialPosts([]);
+        let searchLetter = e.target.value;
         setSearchedUsers([]);
         setSearchText(searchLetter);
+        setPaginatedData([]);
+        if (searchLetter && isRegexPattern(searchLetter)) {
+            setError('❌ Regex patterns are not allowed (/, *, numbers only, etc.)');
+            return;
+        } else {
+            setError('');
+        }
         if (!searchLetter) {
-            return
+            return;
         }
 
         try {
@@ -38,16 +61,12 @@ const Search = () => {
                 }
             };
             const response = await axios.get(
-                `${backendDomain}/social/search/${searchLetter}/`,
+                `${backendDomain}/social/search/${searchLetter}/?page=1&page_size=${postsPerPage}`,
                 config
             );
             if (response.status === 200){
-                debugger
-                setTotalResponseUsers(response.data.users.length);
-                setTotalResponsePosts(response.data.posts.count);
+                setPaginatedData(response.data.posts);
                 setSearchedUsers(response.data.users);
-                setGetPostsData(response.data.posts);
-                setSocialPosts(response.data.posts.results.socialPosts);
             }
 
         } catch (err) {
@@ -80,12 +99,17 @@ const Search = () => {
     };
 
     if (loading) return <div>Loading ...</div>;
-    if (error) return <div>Error: {error}</div>;
 
     return (
         <>
-        <form className="d-flex mb-3 w-75 mt-4">
-            <input id='search' className="form-control me-2" onChange={Submit} type="search" placeholder="Search" aria-label="Search"
+        <form className="mb-3 w-75 mt-4">
+            <input
+                id='search'
+                className={`form-control me-2 ${error ? 'is-invalid' : ''}`}
+                onChange={Submit}
+                type="search"
+                placeholder="Search"
+                aria-label="Search"
                 onKeyDown={(e) => {
                     // Check for Enter key
                     if (e.key === 'Enter') {
@@ -93,6 +117,11 @@ const Search = () => {
                     }
                 }}
             />
+            {error && (
+                <div className="invalid-feedback d-block mt-1">
+                    {error}
+                </div>
+            )}
         </form>
         <div className="post-container2 p-3 mb-3 w-75">
             <div className="d-flex align-items-center">
@@ -100,7 +129,7 @@ const Search = () => {
                     <p className="form-label fs-3">Users</p>
                 </div>
                 <p className="form-label fs-6 text-primary">
-                    {totalResponseUsers > 0 && `${totalResponseUsers} search${totalResponseUsers > 1 ? 'es' : ''}`}
+                    {searchedUsers.length > 0 && `${searchedUsers.length} search${searchedUsers.length > 1 ? 'es' : ''}`}
                 </p>
             </div>
             <div className="container">
@@ -141,11 +170,11 @@ const Search = () => {
                     <p className="form-label fs-3">Posts</p>
                 </div>
                 <p className="form-label fs-6 text-primary">
-                    {totalResponsePosts > 0 && `${totalResponsePosts} search${totalResponsePosts > 1 ? 'es' : ''}`}
+                    {paginatedData.count > 0 && `${paginatedData.count} search${paginatedData.count > 1 ? 'es' : ''}`}
                 </p>
             </div>
             {
-                socialPosts.length < 1 ? (
+                paginatedData.length < 1 ? (
                     <div className="mt-4 text-center">
                         <p>No Posts</p>
                     </div>
@@ -153,14 +182,14 @@ const Search = () => {
                     <Posts
                         pageTitle={"dashboard"}
                         postEditingPermission={postEditingPermission}
-                        paginatedDataResults={getPostsData.results}
-                        permissionToDelete={getPostsData.results.permissionToDelete}
+                        paginatedDataResults={paginatedData.results}
+                        permissionToDelete={paginatedData.results.permissionToDelete}
                         loading={loading}
                         setLoading={setLoading}
                         error={error}
                         setError={setError}
                         getHighlightedText={getHighlightedText}
-                        pagination={null}
+                        pagination={paginatedData}
                     />
                 )
             }

@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react'
 import { jwtDecode } from 'jwt-decode';
 import axios from "axios";
+import ErrorBoundary from './Components/ErrorBounday';
 import Header from './Components/Header';
 import './CSS/App.css'
 
@@ -89,7 +90,9 @@ function App() {
 
   return (
     <>
-    <Header logout={handleLogout} isAuthenticated={isAuthenticated}/>
+    <ErrorBoundary>
+      <Header logout={handleLogout} isAuthenticated={isAuthenticated}/>
+    </ErrorBoundary>
     </>
   )
 }
