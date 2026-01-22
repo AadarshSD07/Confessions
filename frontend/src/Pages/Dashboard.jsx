@@ -12,7 +12,7 @@ export default function Dashboard() {
   const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
   const postsPerPage = import.meta.env.VITE_POSTS_PER_PAGE;
 
-  const backendUrl = `${backendDomain}/social/posts/?post_type=dashboard&page=1&page_size=${postsPerPage}`;
+  const backendUrl = `${backendDomain}/social/dashboard/?post_type=dashboard&page=1&page_size=${postsPerPage}`;
   const postEditingPermission = true;
 
   useEffect(() => {

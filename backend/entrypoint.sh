@@ -16,5 +16,8 @@ done
 echo "Running migrations..."
 python manage.py migrate --noinput
 
+echo "Seeding roles..."
+python seed_roles.py
+
 echo "Starting server..."
 exec "$@"
