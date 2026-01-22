@@ -59,7 +59,9 @@ class User(AbstractUser):
     role = models.ForeignKey(
         Role, 
         on_delete=models.PROTECT,  # Changed from CASCADE to prevent role deletion
-        default=2  # ⚠️ Consider using a dynamic default or null=True
+        default=2,
+        null=True,
+        blank=True
     )
 
     class Meta:
@@ -81,13 +83,6 @@ class User(AbstractUser):
         """
         return self.role.name
 
-
-@receiver(post_save, sender=User)
-def user_role_creation(sender, instance, created, **kwargs):
-    roles = Role.objects.filter()
-    if not roles.exists():
-        roles.create(name="admin", description="Permission for everything in this project. Creator, Destroyer, Owner of the project.")
-        roles.create(name="user", description="permission for selected pages and functionality of the project. Can only experience the project based on creation of admin.")
-
-    if created:
-        instance.role = roles.filter(name="user").first()
+    @property
+    def is_admin(self):
+        return self.role.name == "admin"

@@ -95,6 +95,7 @@ If you prefer manual setup:
   cd backend
   pip install -r requirements.txt
   python manage.py migrate
+  python seed_roles.py
   python manage.py createsuperuser
   python manage.py runserver
   ```
