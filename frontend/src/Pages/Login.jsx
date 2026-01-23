@@ -1,5 +1,4 @@
 import { useState } from "react";
-import {Routes, Route, Link, redirect} from 'react-router-dom';
 import axios from "axios";
 
 const Login = () => {

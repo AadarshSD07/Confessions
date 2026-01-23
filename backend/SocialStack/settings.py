@@ -143,6 +143,7 @@ STATICFILES_DIRS = [
     BASE_DIR / "frontend/dist/static",
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = os.getenv(
