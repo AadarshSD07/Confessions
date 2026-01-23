@@ -3,20 +3,23 @@ set -e
 
 echo "Waiting for PostgreSQL..."
 
-MAX_TRIES=30
-TRIES=0
+echo "=== DB DEBUG START ==="
+echo "POSTGRES_HOST=$POSTGRES_HOST"
+echo "POSTGRES_DB=$POSTGRES_DB"
+echo "POSTGRES_USER=$POSTGRES_USER"
+echo "POSTGRES_PORT=$POSTGRES_PORT"
 
-echo "Checking DB connectivity..."
+echo "Checking psql availability..."
+psql --version || echo "psql NOT FOUND"
 
-until PGPASSWORD=$POSTGRES_PASSWORD psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c '\q' >/dev/null 2>&1; do
-  TRIES=$((TRIES+1))
-  echo "Postgres unavailable ($TRIES/$MAX_TRIES)..."
-  if [ "$TRIES" -ge "$MAX_TRIES" ]; then
-    echo "DB not reachable, exiting."
-    exit 1
-  fi
-  sleep 1
-done
+echo "Trying direct DB connection..."
+PGPASSWORD="$POSTGRES_PASSWORD" psql \
+  -h "$POSTGRES_HOST" \
+  -p "$POSTGRES_PORT" \
+  -U "$POSTGRES_USER" \
+  -d "$POSTGRES_DB" \
+  -c "select 1;"
+echo "=== DB DEBUG END ==="
 
 echo "Postgres is ready."
 
