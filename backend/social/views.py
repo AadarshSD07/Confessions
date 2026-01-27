@@ -61,7 +61,8 @@ def get_dashboard_information(request, user_id=None):
         "fullName": (user.first_name + " " + user.last_name),
         "username": user.username,
         "user_image": user.profile_image if user.profile_image else "",
-        "email": user.email
+        "email": user.email,
+        "gender": user.gender
     }
 
 def build_paginated_posts_response(request, queryset, response_data=None):
@@ -387,7 +388,7 @@ class SearchUsersPosts(APIView):
             ).annotate(
                 imageUrl=Coalesce('profile_image', Value(default_image))
             ).values(
-                "id", "first_name", "last_name", "username", "imageUrl"
+                "id", "first_name", "last_name", "username", "imageUrl", "gender"
             )
         )
         return users

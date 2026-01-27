@@ -46,6 +46,7 @@ class PostSerializer(serializers.ModelSerializer):
     user_profile_image = serializers.SerializerMethodField()
     first_name = serializers.CharField(source='user.first_name', read_only=True)
     last_name = serializers.CharField(source='user.last_name', read_only=True)
+    gender = serializers.CharField(source='user.gender', read_only=True)
     created_at_str = serializers.CharField(source='created_at', read_only=True)
     likes_count = serializers.IntegerField(read_only=True)
     same_user = serializers.BooleanField(read_only=True)
@@ -68,7 +69,8 @@ class PostSerializer(serializers.ModelSerializer):
             'likes_count',
             'same_user',
             'is_liked',
-            'comments'
+            'comments',
+            'gender'
         ]
 
     def get_user_profile_image(self, obj):

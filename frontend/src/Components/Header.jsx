@@ -1,5 +1,5 @@
 import {useState, useEffect , useContext, useRef} from 'react'
-import { BrowserRouter, Routes, Route, Link, Navigate, useLocation} from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, Navigate, useLocation, useNavigate, redirect} from 'react-router-dom';
 import { ThemeContext } from '../ThemeContext';
 import axios from "axios";
 import ChangePassword from "../Pages/ChangePassword";
@@ -7,6 +7,7 @@ import CreatePosts from '../Pages/CreatePosts';
 import Dashboard from '../Pages/Dashboard';
 import Footer from './Footer';
 import Login from '../Pages/Login';
+import NotFound from '../Pages/ErrorPage';
 import Profile from '../Pages/Profile';
 import Register from '../Pages/Register';
 import Search from '../Pages/Search';
@@ -19,8 +20,12 @@ const NavbarWithRouter = (props) => {
     const thumbRef = useRef(null);
 
     const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
-    const defaultImage = `${backendDomain}/static/user_profile_images/default-user-image.png`;
+    const defaultImage = (gender) => {
+        return `${backendDomain}/static/user_profile_images/default-avatar-${gender}.png`;
+    };
+
     const fetchLocation = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const userDetails = async () => {
@@ -34,6 +39,9 @@ const NavbarWithRouter = (props) => {
                 try {
                     const response = await axios.get(`${backendDomain}/header/`, config);
                     setHeaderDetails(response.data);
+                    if (theme !== response.data.theme) {
+                        await onToggle();
+                    }
                 } catch (err) {
                     console.error('Error:', err);
                 }
@@ -43,11 +51,34 @@ const NavbarWithRouter = (props) => {
         userDetails();
     }, []);
 
-    const onToggle = (e) => {
+    const onToggle = async(e) => {
         const nextTheme = theme === "light" ? "dark" : "light";
         applyThemeWithTransition(nextTheme, thumbRef.current);
+        if (!props.isAuthenticated) return
+
+        const config = {
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("access")}`,
+                "Content-Type": "application/json"
+            }
+        };
+        try {
+            await axios.post(
+                `${backendDomain}/accounts/theme/`,
+                nextTheme,
+                config
+            );
+
+        } catch (err) {
+            console.log("Error with request " + err);
+        }
     };
 
+    const handleLogout = () => {
+        props.removeAccessRefresh();
+        props.setIsAuthenticated(false);
+        navigate("/login", { replace: true });
+    }
 
     if (!props.isAuthenticated) {
         if (!["/register","/login","/"].includes(fetchLocation.pathname)) {
@@ -107,11 +138,6 @@ const NavbarWithRouter = (props) => {
             </>
         );
     } else {
-        if (["/register","/login"].includes(fetchLocation.pathname)) {
-            localStorage.setItem("redirectPath", fetchLocation.pathname);
-            return <Navigate to="/" state={{ from: fetchLocation.pathname }} replace />;
-        }
-
         return (
             <>
             <nav className="navbar navbar-expand-lg bg-header">
@@ -154,7 +180,7 @@ const NavbarWithRouter = (props) => {
                             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                                 <li className="nav-item dropdown">
                                     <a className="truncate-text nav-link dropdown-toggle theme-text" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <img src={`${getHeaderDetails.user_image ? getHeaderDetails.user_image : defaultImage}`} alt="User" className="avatar me-3"/>
+                                        <img src={`${getHeaderDetails.user_image ? getHeaderDetails.user_image : defaultImage(getHeaderDetails.gender)}`} alt="User" className="avatar me-3"/>
                                         {
                                             getHeaderDetails.fullName?.trim() ? (
                                                 getHeaderDetails.fullName
@@ -170,7 +196,7 @@ const NavbarWithRouter = (props) => {
                                         <li>
                                             <Link className="dropdown-item" to="/change-password">🗝️Change Password</Link>
                                         </li>
-                                        <li><a className="dropdown-item" href="#" onClick={() => props.logout()}>🚪{"Logout"}</a></li>
+                                        <li><a role="button" className="dropdown-item" onClick={() => handleLogout()}>🚪{"Logout"}</a></li>
                                     </ul>
                                 </li>
                             </ul>
@@ -196,6 +222,9 @@ const NavbarWithRouter = (props) => {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/change-password" element={<ChangePassword />} />
                     <Route path="/search" element={<Search />} />
+
+                    {/* Catch-all route for non-existing URLs */}
+                    <Route path="*" element={<NotFound />} />
                 </Routes>
             </div>
             < Footer />
@@ -211,7 +240,8 @@ export default function Header(props) {
         <BrowserRouter>
             <NavbarWithRouter
                 isAuthenticated={props.isAuthenticated}
-                logout={props.logout}
+                setIsAuthenticated={props.setIsAuthenticated}
+                removeAccessRefresh={props.removeAccessRefresh}
             />
         </BrowserRouter>
         </>

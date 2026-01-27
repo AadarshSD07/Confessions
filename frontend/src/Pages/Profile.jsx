@@ -6,6 +6,7 @@ export default function Profile() {
     const [statusMessage, setStatusMessage] = useState("");
     const [email, setEmail] = useState("");
     const [firstname, setFirstname] = useState("");
+    const [gender, setGender] = useState("");
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState("");
     const [imageUrl, setImageUrl] = useState("");
@@ -16,7 +17,9 @@ export default function Profile() {
     const fileInputRef = useRef(null);
 
     const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
-    const defaultImage = `${backendDomain}/static/user_profile_images/default-user-image.png`;
+    const defaultImage = (gender) => {
+        return `${backendDomain}/static/user_profile_images/default-avatar-${gender}.png`;
+    };
 
     useEffect(() => {
         const fetchUserDetails = async () => {
@@ -38,6 +41,7 @@ export default function Profile() {
                     setLastname(response.data["last_name"]);
                     setEmail(response.data["email"]);
                     setImageUrl(response.data["imageUrl"]);
+                    setGender(response.data["gender"]);
                 } else {
                     setLoading(false);
                     alert("Status " + response.status.toString() + ": " + response.statusText.toString());
@@ -155,7 +159,7 @@ export default function Profile() {
                                         <img src={`${imageUrl}`} alt="User"
                                             className="avatar-profile w-32 h-32 rounded-full object-cover border-4 border-white shadow-sm" />
                                     ) : (
-                                        <img src={`${defaultImage}`} alt="User"
+                                        <img src={`${defaultImage(gender ? gender : "O")}`} alt="User"
                                             className="avatar-profile w-32 h-32 rounded-full object-cover border-4 border-white shadow-sm" />
                                     )}
                                 </div>

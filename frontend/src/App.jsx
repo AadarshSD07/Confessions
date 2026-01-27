@@ -1,4 +1,5 @@
 import {useState, useEffect} from 'react'
+import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import axios from "axios";
 import ErrorBoundary from './Components/ErrorBounday';
@@ -51,9 +52,12 @@ function App() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      // Check if tokens exist
       const access = localStorage.getItem("access");
-      if (localStorage.length === 0 || !localStorage.getItem("access", null)) {
+      const refresh = localStorage.getItem("refresh");
+
+      // No tokens at all
+      if (!access || !refresh) {
+        removeAccessRefresh();
         setIsAuthenticated(false);
         setLoading(false);
         return;
@@ -73,12 +77,7 @@ function App() {
     };
 
     checkAuth();
-  }, []);
-
-  const handleLogout = () => {
-    removeAccessRefresh();
-    window.location.href = "/login";
-  }
+  });
 
   if (loading) {
     return (
@@ -91,7 +90,11 @@ function App() {
   return (
     <>
     <ErrorBoundary>
-      <Header logout={handleLogout} isAuthenticated={isAuthenticated}/>
+      <Header
+        setIsAuthenticated={setIsAuthenticated}
+        isAuthenticated={isAuthenticated}
+        removeAccessRefresh={removeAccessRefresh}
+      />
     </ErrorBoundary>
     </>
   )

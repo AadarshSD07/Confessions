@@ -13,7 +13,9 @@ const Search = () => {
     const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
     const postsPerPage = import.meta.env.VITE_POSTS_PER_PAGE;
     const postEditingPermission = true;
-    const defaultImage = `${backendDomain}/static/user_profile_images/default-user-image.png`;
+    const defaultImage = (gender) => {
+        return `${backendDomain}/static/user_profile_images/default-avatar-${gender}.png`;
+    };
 
     // Regex patterns to BLOCK (common malicious patterns)
     const BLOCKED_PATTERNS = [
@@ -143,7 +145,7 @@ const Search = () => {
                         <div className="post-container mt-3 shadow-sm" key={index}>
                             <div className="post-header2">
                                 <div className="d-flex align-items-center">
-                                    <img src={`${user.imageUrl ? user.imageUrl :defaultImage}`} alt="Profile" className="avatar me-3"/>
+                                    <img src={`${user.imageUrl ? user.imageUrl :defaultImage(user.gender)}`} alt="Profile" className="avatar me-3"/>
                                     <div className="flex-grow-1">
                                         {
                                             user.first_name && user.last_name ? (

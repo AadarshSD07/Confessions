@@ -13,7 +13,9 @@ const SocialPost = (props) => {
 
   let commentsLength = comments ? comments.length : 0;
   const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
-  const defaultImage = `${backendDomain}/static/user_profile_images/default-user-image.png`;
+  const defaultImage = (gender) => {
+    return `${backendDomain}/static/user_profile_images/default-avatar-${gender}.png`;
+  };
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -148,7 +150,7 @@ const SocialPost = (props) => {
       {showComments && (
         <div className="comments-section">
           <div className="comment-form">
-            <img src={`${userInformation["user_image"] ? userInformation["user_image"] : defaultImage}`} alt="Your avatar" className="comment-avatar"/>
+            <img src={`${userInformation["user_image"] ? userInformation["user_image"] : defaultImage(userInformation["gender"])}`} alt="Your avatar" className="comment-avatar"/>
             <input type="text" placeholder="Write a comment..." value={newComment}
               onChange={(e) => setNewComment(e.target.value)} className="comment-input"
               onKeyDown={(e) => {

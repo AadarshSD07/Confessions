@@ -2,7 +2,11 @@ import React from 'react'
 
 const DashboardProfile = (props) => {
   const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
-  const defaultImage = `${backendDomain}/static/user_profile_images/default-user-image.png`;
+
+  const defaultImage = (gender) => {
+    return `${backendDomain}/static/user_profile_images/default-avatar-${gender}.png`;
+  };
+
   return (
     <div className="profile-container w-100 shadow-sm px-2">
       <div className="post-container mt-2 mb-2" id={`div-${props.userInfo.userId}`}>
@@ -13,7 +17,7 @@ const DashboardProfile = (props) => {
             <div className="d-flex align-items-center gap-3">
 
               <img
-                src={props.userInfo.user_image ? props.userInfo.user_image : defaultImage}
+                src={props.userInfo.user_image ? props.userInfo.user_image : defaultImage(props.userInfo.gender)}
                 alt="Profile"
                 className="dashboard-avatar"
               />

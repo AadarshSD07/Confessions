@@ -5,6 +5,7 @@ export default function CreatePosts() {
   const [desc, setDesc] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
+  const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   const fileInputRef = useRef(null);
@@ -41,6 +42,7 @@ export default function CreatePosts() {
 
   const Submit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const config = {
       headers: {
           "Authorization": `Bearer ${localStorage.getItem("access")}`,
@@ -66,6 +68,7 @@ export default function CreatePosts() {
         formData,
         config
       );
+      setLoading(true);
       if (response.status === 201){
         setDesc("");
         setStatus("success");
@@ -74,6 +77,7 @@ export default function CreatePosts() {
       }
 
     } catch (err) {
+      setLoading(true);
       setStatus("danger");
       setStatusMessage("Failure to create new post");
       console.log("Error with request " + err);
@@ -129,8 +133,8 @@ export default function CreatePosts() {
               placeholder='Write something...'
               required
             />
-          <button type="submit" className="btn px-5 mt-4 shadow">
-            Post
+          <button type="submit" className="btn px-5 mt-4 shadow" disabled={loading}>
+            {loading ? 'Posting...' : 'Post'}
           </button>
           </div>
         </form>

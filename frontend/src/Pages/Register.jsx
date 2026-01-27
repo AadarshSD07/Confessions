@@ -104,10 +104,10 @@ const Register = () => {
                 </div>
 
                 <div className="form-group mt-2">
-                    <label htmlFor="gender" className="fw-semibold form-label">
+                    <label className="fw-semibold form-label" htmlFor="gender">
                         Gender
                     </label>
-                    <select name="gender" id="id_gender" className="form-control p-2 w-100"
+                    <select name="gender" id="gender" className="form-control p-2 w-100"
                         onChange={(e) => setGender(e.target.value)} defaultValue={"O"} required>
                         <option value="M">Male</option>
                         <option value="F">Female</option>

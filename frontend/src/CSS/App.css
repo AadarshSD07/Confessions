@@ -22,6 +22,9 @@
   --btn-color: #007bff;
   --btn-hover: #0056b3;
   --txt-editor-hov: #fff;
+  --bg-error-page: linear-gradient(45deg, #0d6efd 0%, #0dcaf0 100%);
+  --bg-error-btn: rgb(255 255 255 / 20%);
+  --bg-error-btn-hover: rgba(255, 255, 255, 0.3);
 }
 
 [data-theme="dark"] {
@@ -29,7 +32,7 @@
   --bg--header: #343d46;
   --text-color: #d2d3d5;
   --txt-color-hov: #fff;
-  --border-color: #77767a;
+  --border-color: #1A202C;
   --card-color: #4A5568;
   --card-border: #000000;
   --footer-brand: #9ca6bb;
@@ -48,6 +51,9 @@
   --btn-color: #5F6D86;
   --btn-hover: #4f5c74;
   --txt-editor-hov: #ededee;
+  --bg-error-page: linear-gradient(45deg, #1A202C 0%, #1f3562 100%);
+  --bg-error-btn: rgb(255 255 255 / 20%);
+  --bg-error-btn-hover: rgba(255, 255, 255, 0.3);
 }
 
 body {
@@ -77,6 +83,11 @@ body {
   border: #0056b3;
 }
 
+.btn.disabled, .btn:disabled, fieldset:disabled .btn {
+  background-color: var(--btn-hover);
+  color: var(--btn-color);
+}
+
 .dropdown-menu {
   background-color: var(--bg--header);
 }
@@ -98,7 +109,7 @@ body {
   color: var(--txt-muted) !important;
 }
 
-.navbar-brand {
+.navbar-brand, .navbar-brand:focus {
   color: var(--text-color);
 }
 
@@ -345,6 +356,68 @@ body {
   margin: 1rem; */
   place-items: center;
   min-height: 70vh;
+}
+
+.page-link {
+  background-color: var(--btn-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+.page-link:hover, .page-link:focus, .page-link:active {
+  background-color: var(--btn-hover);
+  color: var(--txt-color-hov);
+  border: 1px solid var(--border-color);
+}
+
+.error-page {
+  min-height: 100vh;
+  min-width: -webkit-fill-available;
+  background: var(--bg-error-page);
+}
+
+.error-container {
+  max-width: 600px;
+}
+
+.error-code {
+  font-size: 12rem;
+  font-weight: 900;
+  background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0.5));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: pulse 2s infinite;
+}
+
+.error-message {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.btn-glass {
+  background: var(--bg-error-btn);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-glass:hover {
+  background: var(--bg-error-btn-hover);
+  color: white;
+  transform: translateY(-2px);
 }
 
 #root, .App {
@@ -664,18 +737,18 @@ height: calc(100% - 73px);
 }
 
 .disabledButton {
-  background-color: #0d6efd;
-  color: white;
+  background-color: var(--bg--body);
+  color: var(--text-color);
 }
 
 .disabledButton:hover {
-  color: white;
-  background-color: #0c58c2;
+  color: var(--text-color);
+  background-color: var(--bg--body);
 }
 
 .disabledButton:focus {
-  color: white;
-  background-color: #0c58c2;
+  color: var(--text-color);
+  background-color: var(--bg--body);
 }
 
 .profileView {

@@ -1,12 +1,10 @@
+from accounts.models import User
+from accounts.serializers import ChangePasswordSerializer, ProfileInformationSerializer, UserRegistrationSerializer
 from configuration import Config
 from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.models import User
-from django.shortcuts import render
 from rest_framework import permissions, generics
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .serializers import ChangePasswordSerializer, ProfileInformationSerializer, UserRegistrationSerializer
 
 # Create your views here.
 
@@ -197,3 +195,16 @@ class ChangePasswordView(generics.UpdateAPIView):
 
         # Return serializer validation errors
         return Response(serializer.errors, status=Config.bad_request)
+
+
+class ChangeUserTheme(generics.UpdateAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ChangePasswordSerializer
+
+    def post(self, request, *args, **kwargs):
+        theme = request.data
+        current_user = User.objects.filter(id=request.user.id).first()
+        current_user.theme = theme
+        current_user.save()
+        return Response(status=Config.success)

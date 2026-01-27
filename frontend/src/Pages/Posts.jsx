@@ -13,7 +13,9 @@ const Posts = (props) => {
 
   const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
   const backendUrl = `${backendDomain}/social/posts/`;
-  const defaultImage = `${backendDomain}/static/user_profile_images/default-user-image.png`;
+  const defaultImage = (gender) => {
+    return `${backendDomain}/static/user_profile_images/default-avatar-${gender}.png`;
+  };
   const getHighlightedText = props.getHighlightedText ? props.getHighlightedText : false;
 
   const updateStatus = (data) => {
@@ -102,7 +104,7 @@ const Posts = (props) => {
             <div className="post-container mt-4 shadow-sm" id={`div-${post.id}`} key={index}>
               <div className="post-header mb-3">
                 <div className="d-flex align-items-center">
-                  <img src={`${post.user_profile_image ? post.user_profile_image : defaultImage}`}
+                  <img src={`${post.user_profile_image ? post.user_profile_image : defaultImage(post.gender)}`}
                     alt="Profile" className="avatar me-3"/>
                   <div className="flex-grow-1">
                     {post.first_name && post.last_name ? (
