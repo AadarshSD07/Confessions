@@ -11,12 +11,12 @@ const ErrorPage = ({ error, resetErrorBoundary }) => {
           </p>
           <div className="d-flex gap-3 justify-content-center flex-wrap">
             <button 
-              className="btn btn-lg" 
+              className="btn btn-glass px-4 py-2" 
               onClick={resetErrorBoundary}
             >
               Try Again
             </button>
-            <a href="/" className="btn btn-outline-secondary btn-lg">
+            <a href="/" className="btn btn-glass px-4 py-2">
               Go Home
             </a>
           </div>

@@ -65,7 +65,7 @@ const Register = () => {
     return (
         <>
         <div className='post-container p-3 shadow-sm field-width mt-4 pb-5'>
-            <h1 className="text-center pt-4 fs-1">Register</h1>
+            <h2 className="pt-4 pb-3 fw-bold">Create an account</h2>
             <form onSubmit={handleSubmit}>
                 {error && (
                 <div className="alert alert-danger" role="alert">

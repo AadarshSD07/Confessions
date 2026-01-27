@@ -15,6 +15,7 @@ export const ThemeProvider = ({ children }) => {
         "(prefers-color-scheme: light)"
       ).matches;
       if (prefersDark) {
+        debugger
         setTheme("dark");
         document.documentElement.setAttribute("data-theme", "dark");
       }

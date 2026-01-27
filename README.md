@@ -1,37 +1,63 @@
-# 📱 Confessions – Social Media Project
+# 📱 Confessions — Full-Stack Social Media Platform
 
-A full-stack social media application built with Django backend and React frontend, featuring JWT authentication, Role-Based Access Control (RBAC), and now enhanced with **Cloudinary image storage** and **light/dark theme support**. Fully containerized with **Docker** for easy setup and deployment.
+Confessions is a full-stack social media application built with a Django REST backend and React frontend, featuring JWT-based authentication, Role-Based Access Control (RBAC), Cloudinary image storage, and light/dark theme support.
+The entire system is containerized using Docker and deployed using modern cloud platforms.
 
-## ✨ Features
+## 🚀 Live Demo
+Frontend (Vercel): [https://theconfessions.vercel.app/](https://theconfessions.vercel.app/)
+Backend API (Render): Hosted on Render (private API)
+
+## 🧩 Architecture Overview
+```
+React (Vercel)
+↓
+Django REST API (Render)
+↓
+PostgreSQL (Render)
+↓
+Cloudinary (Media Storage)
+```
+
+- Frontend and backend are deployed independently
+- Stateless backend using JWT authentication
+- External media storage via Cloudinary
+
+## ✨ Core Features
 
 ### 🔐 Authentication & Authorization
 - JWT (JSON Web Token) based authentication
+- Secure access & refresh token flow
 - Role-Based Access Control (RBAC) system with two roles:
   - **User**: Standard user with basic permissions
   - **Admin**: Elevated permissions for content moderation
 
 ### 👤 User Capabilities
-- Register and log in
-- Create posts with descriptions and images
-- View and manage own posts on the dashboard
-- Edit post descriptions (within 1 hour of posting)
+- User registration and login
+- Create posts with images and descriptions
 - View all posts from all users
 - Like and comment on posts
-- Search and filter posts
-- Navigate to other users’ profile pages via search
+- Search posts and users by keyword
+- Navigate to other users’ dashboards
+- Edit post descriptions **within 1 hour** of posting
 - Delete own posts
+- Manage profile information
+- Change password securely
 
 ### 🛡️ Admin Capabilities
-- All user capabilities
-- Delete posts of any user (content moderation)
+- All user privileges
+- Delete posts from any user
 - Manage inappropriate or unfit content
+
+## ➕ Supporting Features
 
 ### 🎨 UI Enhancements
 - **Light/Dark Theme Toggle** for improved accessibility and user experience
 
 ### ☁️ Cloudinary Integration
-- Profile images and post images are stored in **Cloudinary** instead of local media files
-- Required configuration:
+- Profile images and post images stored externally
+- No local media storage dependency
+
+- **Required environment variables:**:
   ```bash
   CLOUDINARY_URL="Cloudinary URL"
   CLOUD_NAME="Cloud name"
@@ -40,19 +66,33 @@ A full-stack social media application built with Django backend and React fronte
   ```  
 - Learn more about Cloudinary [here](https://cloudinary.com/)
 
+## 🔐 Authentication Flow
+1. User logs in with credentials
+2. Backend returns JWT access & refresh tokens
+3. Frontend stores tokens securely
+4. Access token is attached to protected API requests
+5. Refresh token is used to obtain a new access token when expired
+
 ### 📂 Application Sections
-1. **Dashboard/User Profile** – Displays the logged-in user's posts and serves as the profile page for other users
-2. **View Posts** – Shows all posts from all users
-3. **Create Post** – Form to create new posts with description and image fields
-4. **Profile** – Form to update user details
-5. **Change Password** – Form to change password using the previous password
-6. **Search** – Searches users and posts by keyword and allows navigation to user dashboards
+1. **Dashboard/User Profile**
+  Displays the logged-in user's posts and acts as a public profile for other users
+2. **View Posts**
+  Shows all posts from all users
+3. **Create Post**
+  Form to upload images and descriptions
+4. **Profile**
+  Update user details
+5. **Change Password**
+  Secure password update flow
+6. **Search**
+  Search users and posts and navigate to user dashboards
 
 ## 🛠️ Tech Stack
 
 ### Backend
 - Django
 - Django REST Framework
+- PostgreSQL
 - JWT Authentication
 
 ### Frontend
@@ -60,11 +100,10 @@ A full-stack social media application built with Django backend and React fronte
 - React Router
 - Axios / Fetch
 
-### Deployment
-- Docker
-- Docker Compose
-- Hosted on **Render (backend)** and **Vercel (frontend)**
-- Live demo: [https://theconfessions.vercel.app/](https://theconfessions.vercel.app/)
+### Deployment & DevOps
+- Docker & Docker Compose
+- **Render (Backend & Database)**
+- **Vercel (Frontend)**
 
 ## 📁 Project Structure
 
@@ -73,7 +112,7 @@ project-root/
 ├── backend/          # Django backend application
 ├── frontend/         # React frontend application
 ├── docker-compose.yml # Docker Compose configuration
-└── package.json      # Root package.json for concurrent server execution
+└── package.json      # Root package.json for concurrent server execution in python
 ```
 
 ## ⚙️ Installation & Setup
@@ -87,7 +126,7 @@ project-root/
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd <project-directory>
+   cd Confessions
    ```
 
 2. **Build and run with Docker Compose**
@@ -100,7 +139,7 @@ project-root/
      docker-compose up
      ```
 
-This will start both the **Django backend** and **React frontend** containers automatically.
+This starts:
 - Backend: `http://localhost:8000`
 - Frontend: `http://localhost:3000` (or `http://localhost:5173` depending on config)
 
@@ -111,7 +150,7 @@ If you prefer manual setup:
   cd backend
   pip install -r requirements.txt
   python manage.py migrate
-  python seed_roles.py
+  python seed_roles_superuser.py
   python manage.py createsuperuser
   python manage.py runserver
   ```
@@ -122,7 +161,7 @@ If you prefer manual setup:
   npm start
   ```
 
-## � API Endpoints
+## 🔌 API Endpoints
 
 ### Authentication
 - `POST /auth/login/` – User login
@@ -136,11 +175,11 @@ If you prefer manual setup:
 ### Social
 - `GET /social/posts/` – Get all posts
 - `POST /social/posts/` – Create a new post
-- `GET /social/dashboard/:id/` – Get a user’s dashboard (profile + posts)
-- `DELETE /social/posts/:id/` – Delete a post (own posts for users, any post for admins)
-- `POST /social/like/:id/` – Like a post
-- `POST /social/comment/:id/` – Comment on a post
-- `GET /social/search/<search_text>/` – Search users and posts by keyword, navigate to user dashboards
+- `GET /social/dashboard/{user_id}/` – Get a user’s dashboard (profile + posts)
+- `DELETE /social/posts/{post_id}/` – Delete a post (own posts for users, any post for admins)
+- `POST /social/like/{post_id}/` – Like a post
+- `POST /social/comment/{post_id}/` – Comment on a post
+- `GET /social/search/{query}/` – Search users and posts by keyword, navigate to user dashboards
 
 ## 👥 User Roles & Permissions
 
@@ -155,19 +194,21 @@ If you prefer manual setup:
 | Navigate to Other User Dashboards | ✓  | ✓     |
 
 ## �🔮 Future Enhancements
-- Dedicated user profile pages (expanded beyond dashboard)
-- Real-time notifications
-- Email verification
+- Separate public profile pages (distinct from dashboards)
+- Real-time notifications (WebSockets)
+- Email verification & password recovery
+- Improved moderation tools for admins
 
 ## 🤝 Contributing
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
 ## 📜 License
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.
+See the [LICENSE](https://github.com/AadarshSD07/Confessions/blob/main/LICENSE/) file for details.
 
 ## 📬 Contact
-For questions or support, please open an issue in the repository.
+For questions, feedback, or issues, please open an issue on GitHub.

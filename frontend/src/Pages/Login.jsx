@@ -38,7 +38,8 @@ const Login = () => {
   return (
     <>
     <div className='post-container p-3 shadow-sm field-width mt-4 pb-5'>
-      <p className="text-center pt-4 fs-1">Login</p>
+      <h2 className="pt-4 fw-bold">Welcome back</h2>
+      <p className="text-muted pb-1">Please enter your details</p>
       <form onSubmit={handleSubmit}>
         {error && (
           <div className="alert alert-danger" role="alert">
@@ -62,7 +63,7 @@ const Login = () => {
         
         <div className="d-flex justify-content-center mt-4 mx-auto">
           <button type="submit" className="login-button shadow mt-2" disabled={loading}>
-            {loading ? 'SIGNING IN...' : 'SIGN IN'}
+            {loading ? 'LOGGING IN...' : 'LOGIN'}
           </button>
         </div>
       </form>
