@@ -20,12 +20,13 @@ class CommentSerializer(serializers.ModelSerializer):
     """
     user = serializers.CharField(source='user.get_full_name', read_only=True)
     user_image = serializers.SerializerMethodField()
+    gender = serializers.CharField(source='user.gender', read_only=True)
     timestamp = serializers.CharField(source='created_at', read_only=True)
     post_id = serializers.IntegerField(source='post.id', read_only=True)
 
     class Meta:
         model = models.UserComment
-        fields = ['id', 'user', 'user_image', 'post_id', 'comment', 'timestamp']
+        fields = ['id', 'user', 'user_image', 'post_id', 'comment', 'timestamp', 'gender']
 
     def get_user_image(self, obj):
         """

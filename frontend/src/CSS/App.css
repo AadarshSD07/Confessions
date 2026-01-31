@@ -215,7 +215,7 @@ body {
 
 .comments-section {
   padding: 16px 20px;
-  background: var(--txt-editor);
+  background: var(--img-bg);
 }
 
 .comment-form {
@@ -223,14 +223,14 @@ body {
   align-items: center;
   gap: 12px;
   margin-bottom: 20px;
-  background: var(--comment-editor);
+  background: var(--card-color);
   padding: 12px;
   border-radius: 20px;
 }
 
 .comment-content {
   flex: 1;
-  background: var(--comment-editor);
+  background: var(--card-color);
   padding: 12px;
   border-radius: 12px;
 }
