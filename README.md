@@ -19,9 +19,10 @@ PostgreSQL (Render)
 Cloudinary (Media Storage)
 ```
 
-- Frontend and backend are deployed independently
-- Stateless backend using JWT authentication
-- External media storage via Cloudinary
+- Frontend and backend are **fully decoupled**
+- **Stateless backend** using JWT authentication
+- Externalized media storage for scalability
+- Cloud-based deployment with containerization
 
 ## ✨ Core Features
 
@@ -33,10 +34,57 @@ Cloudinary (Media Storage)
   - **User**: Standard user with basic permissions
   - **Admin**: Elevated permissions for content moderation
 
-## 🔑 Google OAuth2 Authentication
-Users can authenticate using their **Google account** directly from the login page.
+## 🔁 Forgot Password & Secure Password Reset
+The application supports a **secure email-based password reset flow**, similar to real-world production systems.
 
-### 🧭 Authentication Flow
+### 🔄 Password Reset Flow
+```
+User clicks "Forgot Password"
+↓
+User submits registered email
+↓
+Backend generates UID + secure reset token
+↓
+Password reset link emailed to user
+↓
+User sets a new password via frontend
+↓
+Password updated securely in backend
+```
+
+### 🔐 Security Considerations
+- Token-based, time-limited reset links
+- Tokens are generated and validated **only on the backend**
+- Passwords are hashed using Django’s built-in security mechanisms
+- Prevents token forgery and reuse
+
+## 📧 Email Service (Gmail App Password)
+Password reset emails are sent using **Gmail SMTP with App Passwords**, ensuring secure email delivery without exposing account credentials.
+
+### 🔑 Gmail App Password Setup
+- App passwords are generated from:
+```
+Google Account → Security → App Passwords
+```
+- Requires **2-Step Verification**
+- App password acts as the SMTP credential (not the Gmail password)
+
+### 🔐 Required Environment Variables
+```bash
+EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST="smtp.gmail.com"
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+
+EMAIL_HOST_USER="admin_email@gmail.com"
+EMAIL_HOST_PASSWORD="google_app_password"
+DEFAULT_FROM_EMAIL="Confessions <admin_email@gmail.com>"
+```
+
+## 🔑 Google OAuth2 Authentication
+Users can sign in using their Google accounts for a frictionless onboarding experience.
+
+### 🧭 OAuth Flow
 ```
 Google ID Token
 ↓
@@ -48,6 +96,13 @@ Stored in localStorage
 ↓
 User Redirected to Dashboard
 ```
+
+## 🔐 Authentication Flow 
+1. User logs in with credentials
+2. Backend returns JWT access & refresh tokens
+3. Frontend stores tokens securely
+4. Access token is attached to protected API requests
+5. Refresh token is used to obtain a new access token when expired
 
 ### 🛠️ Google OAuth2 Setup (Required)
 
@@ -87,16 +142,15 @@ This Client ID is:
 - Verified by Django backend before issuing JWT tokens
 
 ### 👤 User Capabilities
-- Sign up and log in (email/password or Google OAuth)
+- Register and authenticate (Email/Password or Google OAuth)
 - Create posts with images and descriptions
 - View all posts from all users
 - Like and comment on posts
 - Search posts and users by keyword
-- Navigate to other users’ dashboards
+- View public user dashboards
 - Edit post descriptions **within 1 hour** of posting
 - Delete own posts
-- Manage profile information
-- Change password securely
+- Manage profile information and change password securely
 
 ### 🛡️ Admin Capabilities
 - All user privileges
@@ -107,10 +161,13 @@ This Client ID is:
 
 ### 🎨 UI Enhancements
 - **Light/Dark Theme Toggle** for improved accessibility and user experience
+- Responsive design
+- User-friendly authentication flows
 
 ### ☁️ Cloudinary Integration
 - Profile images and post images stored externally
 - No local media storage dependency
+- Optimized for scalability and performance
 
 - **Required environment variables:**:
   ```bash
@@ -120,13 +177,6 @@ This Client ID is:
   API_SECRET="API Secret"
   ```  
 - Learn more about Cloudinary [here](https://cloudinary.com/)
-
-## 🔐 Authentication Flow
-1. User logs in with credentials
-2. Backend returns JWT access & refresh tokens
-3. Frontend stores tokens securely
-4. Access token is attached to protected API requests
-5. Refresh token is used to obtain a new access token when expired
 
 ### 📂 Application Sections
 1. **Dashboard/User Profile**
@@ -150,6 +200,7 @@ This Client ID is:
 - PostgreSQL
 - JWT Authentication
 - Google OAuth2
+- SMTP Email Integration
 
 ### Frontend
 - React
@@ -229,6 +280,8 @@ If you prefer manual setup:
 - `POST /accounts/register/` – Register a new user
 - `GET/POST /accounts/user-details/` – Fetch or update user profile information
 - `POST /accounts/change-user-password/` – Change user password
+- `POST /accounts/password-reset/` – Reset user password form
+- `POST /accounts/password-reset-confirm/` – Reset user password
 
 ### Social
 - `GET /social/posts/` – Get all posts
@@ -251,11 +304,16 @@ If you prefer manual setup:
 | Delete Any Post                 | ✗    | ✓     |
 | Navigate to Other User Dashboards | ✓  | ✓     |
 
+## 🚀 Deployment Strategy
+- Dockerized services for consistent environments
+- Independent frontend and backend deployments
+- Scalable cloud infrastructure
+
 ## �🔮 Future Enhancements
-- Separate public profile pages (distinct from dashboards)
 - Real-time notifications (WebSockets)
-- Email verification & password recovery
+- Email verification on signup
 - Improved moderation tools for admins
+- Separate public profile pages
 
 ## 🤝 Contributing
 1. Fork the repository
