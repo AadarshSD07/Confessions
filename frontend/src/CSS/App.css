@@ -30,6 +30,7 @@
   --bg-btn-danger: #dc3545;
   --bg-btn-danger-hover: #bb2d3b;
   --bg-google-btn: #e9ebf1;
+  --shimmer-color: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
 }
 
 [data-theme="dark"] {
@@ -64,6 +65,7 @@
   --bg-btn-danger: #dc3545;
   --bg-btn-danger-hover: #bb2d3b;
   --bg-google-btn: #5F6D86;
+  --shimmer-color: linear-gradient(90deg, #1A202C 25%, #343d46 50%, #383946 75%);
 }
 
 body {
@@ -939,7 +941,7 @@ height: calc(100% - 73px);
 }
 
 .shimmer {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: var(--shimmer-color);
   background-size: 1000px 100%;
   animation: shimmer 2s infinite linear;
 }
