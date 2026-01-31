@@ -16,6 +16,7 @@ class Config:
     bad_request = status.HTTP_400_BAD_REQUEST
     created = status.HTTP_201_CREATED
     not_found = status.HTTP_404_NOT_FOUND
+    method_not_allowed = status.HTTP_405_METHOD_NOT_ALLOWED
 
     """Project Configurations"""
     ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",")
@@ -24,9 +25,15 @@ class Config:
     CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
     CORS_ALLOWED_ORIGINS = [o.strip() for o in CORS_ALLOWED_ORIGINS if o.strip()]
     DEBUG_MODE = os.getenv('DEBUG', 'False') == 'True'
+    EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+    MORNING_LIMIT = 3
+    AFTERNOON_LIMIT = 6
+    NIGHT_LIMIT = 10
 
     """Project Variables"""
     posts_per_page = os.getenv('POSTS_PER_PAGE', '50')

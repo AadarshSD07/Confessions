@@ -107,3 +107,20 @@ class User(AbstractUser):
     @property
     def is_admin(self):
         return self.role.name == "admin"
+
+
+class PasswordResetRequest(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="password_reset_requests"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["user", "created_at"])
+        ]
+
+    def __str__(self):
+        return f"{self.user.email} - {self.created_at}"

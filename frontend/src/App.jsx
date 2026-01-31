@@ -1,9 +1,9 @@
 import {useState, useEffect} from 'react'
-import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import axios from "axios";
 import ErrorBoundary from './Components/ErrorBounday';
 import Header from './Components/Header';
+import HeaderSkimmer from './skimmers/HeaderSkimmer';
 import './CSS/App.css'
 
 const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
@@ -77,13 +77,13 @@ function App() {
     };
 
     checkAuth();
-  });
+  }, []);
 
   if (loading) {
     return (
-      <div style={{ padding: '20px', textAlign: 'center' }}>
-        <h2>Loading...</h2>
-      </div>
+      <>
+      <HeaderSkimmer />
+      </>
     );
   }
 

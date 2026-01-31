@@ -13,10 +13,12 @@ const Posts = (props) => {
 
   const backendDomain = import.meta.env.VITE_BACKEND_DOMAIN;
   const backendUrl = `${backendDomain}/social/posts/`;
+  const getHighlightedText = props.getHighlightedText ? props.getHighlightedText : false;
+  const navigate = useNavigate();
+
   const defaultImage = (gender) => {
     return `${backendDomain}/static/user_profile_images/default-avatar-${gender}.png`;
   };
-  const getHighlightedText = props.getHighlightedText ? props.getHighlightedText : false;
 
   const updateStatus = (data) => {
     setStatus(data.status);
@@ -74,7 +76,6 @@ const Posts = (props) => {
     }
   };
 
-  const navigate = useNavigate();
   const handleClick = (e) => {
       navigate(`/dashboard/${e.target.id}`, { state: { onclick: true } });
   };
@@ -85,7 +86,6 @@ const Posts = (props) => {
       {statusMessage && (
         <div className={`alert alert-${status} mt-3`} role="alert">
             {statusMessage}
-            <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       )}
       { socialPosts.length < 1 ? (

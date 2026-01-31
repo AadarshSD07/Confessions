@@ -6,4 +6,6 @@ urlpatterns = [
     path("user-details/", views.UserProfileInformation.as_view()),
     path("theme/", views.ChangeUserTheme.as_view()),
     path("change-user-password/", views.ChangePasswordView.as_view()),
+    path("password-reset/", views.RequestPasswordResetAPI.as_view()),
+    path("password-reset-confirm/", views.ConfirmPasswordResetAPI.as_view()),
 ]

@@ -70,7 +70,6 @@ const Register = () => {
                 {error && (
                 <div className="alert alert-danger" role="alert">
                     {error}
-                    <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 )}
                 

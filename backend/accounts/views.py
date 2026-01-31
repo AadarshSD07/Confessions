@@ -1,12 +1,46 @@
-from accounts.models import User
-from accounts.serializers import ChangePasswordSerializer, ProfileInformationSerializer, UserRegistrationSerializer
+from accounts.models import User, PasswordResetRequest
+from accounts import serializers
 from configuration import Config
+from datetime import time
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils import timezone
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from django.core.mail import send_mail
 from rest_framework import permissions, generics
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 # Create your views here.
+def get_current_slot_limit(now):
+    if time(6, 0) <= now.time() < time(12, 0):
+        return Config.MORNING_LIMIT
+    elif time(12, 0) <= now.time() < time(18, 0):
+        return Config.AFTERNOON_LIMIT
+    else:
+        return Config.NIGHT_LIMIT
+
+def get_today_request_count(user, now):
+    today = now.date()
+
+    return PasswordResetRequest.objects.filter(
+        user=user,
+        created_at__date=today
+    ).count()
+
+def can_request_password_reset(user):
+    now = timezone.now()
+
+    today_count = get_today_request_count(user, now)
+    slot_limit = get_current_slot_limit(now)
+
+    remaining = slot_limit - today_count
+
+    return remaining > 0, max(remaining, 0)
+
 
 class UserRegistration(generics.CreateAPIView):
     """
@@ -25,7 +59,7 @@ class UserRegistration(generics.CreateAPIView):
         400 Bad Request: Serializer validation errors
     """
     permission_classes = [permissions.AllowAny]
-    serializer_class = UserRegistrationSerializer
+    serializer_class = serializers.UserRegistrationSerializer
 
     def post(self, request):
         """
@@ -79,7 +113,7 @@ class UserProfileInformation(generics.UpdateAPIView):
     """
     authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = ProfileInformationSerializer
+    serializer_class = serializers.ProfileInformationSerializer
 
     def get(self, request):
         """
@@ -143,7 +177,7 @@ class ChangePasswordView(generics.UpdateAPIView):
     """
     authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = ChangePasswordSerializer
+    serializer_class = serializers.ChangePasswordSerializer
 
     def get_object(self):
         """
@@ -200,7 +234,7 @@ class ChangePasswordView(generics.UpdateAPIView):
 class ChangeUserTheme(generics.UpdateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = ChangePasswordSerializer
+    serializer_class = serializers.ChangePasswordSerializer
 
     def post(self, request, *args, **kwargs):
         theme = request.data
@@ -208,3 +242,76 @@ class ChangeUserTheme(generics.UpdateAPIView):
         current_user.theme = theme
         current_user.save()
         return Response(status=Config.success)
+
+
+class RequestPasswordResetAPI(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        try:
+            user = User.objects.get(email=request.data["email"])
+        except Exception as e:
+            return Response({"message": "Email does not exist"}, status=Config.bad_request)
+
+        allowed, remaining = can_request_password_reset(user)
+        if not allowed:
+            return Response(
+                {"message": "Password reset request limit exceeded for this time slot"},
+                status=Config.method_not_allowed
+            )
+
+        serializer = serializers.RequestPasswordResetSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = PasswordResetTokenGenerator().make_token(user)
+
+        reset_link = f"http://localhost:5173/reset-password?uid={uid}&token={token}"
+
+        send_mail(
+            subject="Password Reset",
+            message=f"Click to reset password: {reset_link}",
+            from_email=None,
+            recipient_list=[user.email],
+        )
+
+        return Response(
+            {"message": "Password reset link sent"},
+            status=Config.success
+        )
+
+
+class ConfirmPasswordResetAPI(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = serializers.ConfirmPasswordResetSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        uid = serializer.validated_data["uid"]
+        token = serializer.validated_data["token"]
+        new_password = serializer.validated_data["new_password"]
+        hashed_password = make_password(new_password)
+
+        try:
+            user_id = urlsafe_base64_decode(uid).decode()
+            user = User.objects.get(pk=user_id)
+        except Exception:
+            return Response(
+                {"error": "Invalid UID"},
+                status=Config.bad_request
+            )
+
+        if not PasswordResetTokenGenerator().check_token(user, token):
+            return Response(
+                {"error": "Invalid or expired token"},
+                status=Config.bad_request
+            )
+
+        user.set_password(new_password)
+        user.save()
+
+        return Response(
+            {"message": "Password reset successful"},
+            status=Config.success
+        )

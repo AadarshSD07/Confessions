@@ -183,7 +183,7 @@ const Search = () => {
             {
                 paginatedData.length < 1 ? (
                     <div className="mt-4 text-center">
-                        <p>No Posts</p>
+                        <p>No Posts To Display</p>
                     </div>
                 ) : (
                     <Posts

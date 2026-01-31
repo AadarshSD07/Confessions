@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import ProfileSkimmer from "../skimmers/ProfileSkimmer";
 
 export default function Profile() {
     const [status, setStatus] = useState("");
     const [statusMessage, setStatusMessage] = useState("");
     const [email, setEmail] = useState("");
     const [firstname, setFirstname] = useState("");
-    const [gender, setGender] = useState("");
+    const [gender, setGender] = useState("O");
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState("");
     const [imageUrl, setImageUrl] = useState("");
@@ -35,21 +36,21 @@ export default function Profile() {
                     config
                 );
                 if (response.status === 200){
-                    setLoading(false);
+                    setGender(response.data["gender"]);
                     setUsername(response.data["username"]);
                     setFirstname(response.data["first_name"]);
                     setLastname(response.data["last_name"]);
                     setEmail(response.data["email"]);
                     setImageUrl(response.data["imageUrl"]);
-                    setGender(response.data["gender"]);
-                } else {
                     setLoading(false);
+                } else {
                     alert("Status " + response.status.toString() + ": " + response.statusText.toString());
+                    setLoading(false);
                 }
             } catch (err) {
-                setLoading(false);
                 alert(err);
                 console.log("Error with request");
+                setLoading(false);
             }
         }
         fetchUserDetails();
@@ -92,6 +93,7 @@ export default function Profile() {
         formData.append('first_name', firstname);
         formData.append('last_name', lastname);
         formData.append('email', email);
+        formData.append('gender', gender);
 
         const fileInput = fileInputRef.current;
         if (fileInput.files.length > 0) {
@@ -131,9 +133,7 @@ export default function Profile() {
 
     if (loading) {
         return (
-        <div style={{ padding: '20px', textAlign: 'center' }}>
-            <h2>Loading...</h2>
-        </div>
+        <ProfileSkimmer />
         );
     }
 
@@ -142,7 +142,6 @@ export default function Profile() {
         {statusMessage && (
             <div className={`field-width alert alert-${status} mt-3`} role="alert">
                 <div dangerouslySetInnerHTML={{ __html: statusMessage }} />
-                <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         )}
         <div className="post-container p-3 shadow-sm field-width mt-4">

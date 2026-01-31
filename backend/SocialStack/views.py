@@ -3,6 +3,7 @@ from accounts.models import User
 from configuration import Config
 from django.views.generic import TemplateView
 from django.conf import settings
+from django.core.mail import send_mail
 from django.middleware.csrf import get_token
 from google.oauth2 import id_token
 from google.auth.transport import requests

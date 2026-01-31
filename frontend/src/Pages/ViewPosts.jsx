@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react';
-import Posts from "./Posts";
 import axios from 'axios';
+import Posts from "./Posts";
+import ViewPostsSkimmer from '../skimmers/ViewPostsSkimmer';
 
 
 export default function ViewPosts() {
@@ -43,7 +44,7 @@ export default function ViewPosts() {
     fetchPosts();
   }, []);
 
-  if (loading || !paginatedData) return <div>Loading posts...</div>;
+  if (loading || !paginatedData) return <ViewPostsSkimmer />;
   if (error) return <div>Error: {error}</div>;
 
   return (

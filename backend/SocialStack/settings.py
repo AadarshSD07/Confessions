@@ -169,3 +169,15 @@ USE_TZ = True               # Enable timezone support
 
 # Third Party Authentication using Google OAuth2
 GOOGLE_CLIENT_ID = Config.GOOGLE_CLIENT_ID
+
+# For testing - emails print to console
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = Config.EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = Config.EMAIL_HOST_PASSWORD
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

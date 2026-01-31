@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react';
 import axios from 'axios';
 import DashboardProfile from '../Components/DashboardProfile';
+import DashboardSkimmer from '../skimmers/DashboardSkimmer';
 import Posts from "./Posts";
 
 export default function Dashboard() {
@@ -43,7 +44,7 @@ export default function Dashboard() {
     fetchPosts();
   }, []);
 
-  if (loading || !paginatedData) return <div>Loading posts...</div>;
+  if (loading || !paginatedData) return <DashboardSkimmer />;
   if (error) return <div>Error: {error}</div>;
 
   return (

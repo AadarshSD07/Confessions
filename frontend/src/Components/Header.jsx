@@ -1,11 +1,12 @@
 import {useState, useEffect , useContext, useRef} from 'react'
-import { BrowserRouter, Routes, Route, Link, Navigate, useLocation, useNavigate, redirect} from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, Navigate, useLocation, useNavigate} from 'react-router-dom';
 import { ThemeContext } from '../ThemeContext';
 import axios from "axios";
 import ChangePassword from "../Pages/ChangePassword";
 import CreatePosts from '../Pages/CreatePosts';
 import Dashboard from '../Pages/Dashboard';
 import Footer from './Footer';
+import HeaderSkimmer from '../skimmers/HeaderSkimmer';
 import Login from '../Pages/Login';
 import NotFound from '../Pages/ErrorPage';
 import Profile from '../Pages/Profile';
@@ -13,6 +14,7 @@ import Register from '../Pages/Register';
 import Search from '../Pages/Search';
 import UserProfile from '../Pages/UserProfile';
 import ViewPosts from '../Pages/ViewPosts';
+import ResetPassword from '../Pages/ResetPassword';
 
 const NavbarWithRouter = (props) => {
     const { theme, applyThemeWithTransition } = useContext(ThemeContext);
@@ -81,7 +83,7 @@ const NavbarWithRouter = (props) => {
     }
 
     if (!props.isAuthenticated) {
-        if (!["/register","/login","/"].includes(fetchLocation.pathname)) {
+        if (!["/register","/login","/reset-password", "/"].includes(fetchLocation.pathname)) {
             localStorage.setItem("redirectPath", fetchLocation.pathname);
             return <Navigate to="/" state={{ from: fetchLocation.pathname }} replace />;
         }
@@ -121,7 +123,7 @@ const NavbarWithRouter = (props) => {
                         <div className='d-flex'>
                             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                                 <li className="nav-item dropdown">
-                                    {fetchLocation.pathname === "/register" ? (
+                                    {fetchLocation.pathname === "/register" || fetchLocation.pathname === "/reset-password" ? (
                                         <Link className="navbar-brand" to="/login">Login</Link>
                                     ) : (
                                         <Link className="navbar-brand" to="/register">Sign Up</Link>
@@ -137,11 +139,34 @@ const NavbarWithRouter = (props) => {
                     <Route path="/" element={<Navigate to="/login" replace />} />
                     <Route path="/login/*" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
                 </Routes>
             </div>
             </>
         );
     } else {
+        if (getHeaderDetails.length < 1) {
+            return (
+                <>
+                <HeaderSkimmer />
+                <div className='page-content pb-5'>
+                    <Routes>
+                        <Route path="/" element={<Dashboard />} />
+                        <Route path="/dashboard/:userId" element={<UserProfile />} />
+                        <Route path="/view-posts" element={<ViewPosts />} />
+                        <Route path="/create-posts" element={<CreatePosts />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/change-password" element={<ChangePassword />} />
+                        <Route path="/search" element={<Search />} />
+
+                        {/* Catch-all route for non-existing URLs */}
+                        <Route path="*" element={<NotFound />} />
+                    </Routes>
+                </div>
+                < Footer />
+                </>
+            );
+        }
         return (
             <>
             <nav className="navbar navbar-expand-lg bg-header">
@@ -157,16 +182,13 @@ const NavbarWithRouter = (props) => {
                         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                             <span></span>
                         </ul>
-                        { getHeaderDetails ?
-                            <nav className="navbar-nav me-auto mb-2 mb-lg-0">
-                                <Link className="nav-link theme-text" to="/">👤Dashboard</Link>
-                                {/* <Link className="nav-link" to={`/dashboard/${getHeaderDetails.userId}`}>👤Dashboard</Link> */}
-                                <Link className="nav-link theme-text" to="/view-posts">📝View Posts</Link>
-                                <Link className="nav-link theme-text" to="/create-posts">➕Create Post</Link>
-                                <Link className="nav-link theme-text" to="/search">🔍Search</Link>
-                            </nav>
-                            : ""
-                        }
+                        <nav className="navbar-nav me-auto mb-2 mb-lg-0">
+                            <Link className="nav-link theme-text" to="/">👤Dashboard</Link>
+                            {/* <Link className="nav-link" to={`/dashboard/${getHeaderDetails.userId}`}>👤Dashboard</Link> */}
+                            <Link className="nav-link theme-text" to="/view-posts">📝View Posts</Link>
+                            <Link className="nav-link theme-text" to="/create-posts">➕Create Post</Link>
+                            <Link className="nav-link theme-text" to="/search">🔍Search</Link>
+                        </nav>
                         <label>
                             <input onChange={onToggle} className='toggle-checkbox' type='checkbox' checked={theme === "dark"} />
                             <div className='toggle-slot me-2'>

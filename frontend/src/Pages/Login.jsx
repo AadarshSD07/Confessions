@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { BrowserRouter, Routes, Route, Link, Navigate, useLocation, useNavigate} from 'react-router-dom';
 import { GoogleLogin } from "@react-oauth/google";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import axios from "axios";
 
 const Login = () => {
@@ -61,16 +63,15 @@ const Login = () => {
         {error && (
           <div className="alert alert-danger" role="alert">
             {error}
-            <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
         )}
-        
+
         <div className="form-group mt-2">
           <label className="fw-semibold" htmlFor="username">Username</label>
           <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="form-control shadow-sm"
             placeholder="username" id="username" minLength="3" maxLength="150" disabled={loading} required />
         </div>
-        
+
         <div className="form-group mt-2">
           <label className="fw-semibold" htmlFor="password">Password</label>
           <div className="input-group shadow-sm">
@@ -96,6 +97,10 @@ const Login = () => {
 
           <small className="form-text text-muted">Password must be at least 8 characters long.</small>
         </div>
+
+        <div className="text-end">
+            <Link className="nav-link text-primary" to="/reset-password">Forget Password?</Link>
+        </div>
         
         <div className="d-flex justify-content-center mt-4 mx-auto">
           <button type="submit" className="login-button shadow mt-2" disabled={loading}>
@@ -104,10 +109,12 @@ const Login = () => {
         </div>
       </form>
       <div>
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
         <GoogleLogin
           onSuccess={handleSuccess}
           onError={() => console.log("Login Failed")}
         />
+      </GoogleOAuthProvider>
       </div>
     </div>
     </>

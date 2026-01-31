@@ -71,6 +71,7 @@ const SocialPost = (props) => {
       id: commentsLength + 1,
       user: userInformation["fullName"],
       user_image: userInformation["user_image"],
+      gender: userInformation["gender"],
       comment: newComment,
       timestamp: 'Just now'
     };
