@@ -14,6 +14,8 @@ React (Vercel)
 ↓
 Django REST API (Render)
 ↓
+Moderation Microservice (FastAPI)
+↓
 PostgreSQL (Render)
 ↓
 Cloudinary (Media Storage)
