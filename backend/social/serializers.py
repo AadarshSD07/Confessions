@@ -1,3 +1,4 @@
+import httpx
 from accounts.cloudinary import upload_image
 from configuration import Config
 from django.contrib.auth import get_user_model
@@ -99,6 +100,10 @@ class CreatePostSerializer(serializers.ModelSerializer):
         """
         Create a new post with the authenticated user
         """
+        # Confession check before saving
+        response = httpx.post(Config.moderation_url, json={"text": validated_data.get('post_desc')})
+        result = response.json()
+
         # User is passed via context from the view
         user = self.context['request'].user
 
@@ -114,7 +119,10 @@ class CreatePostSerializer(serializers.ModelSerializer):
             cloud_image_info = upload_image(imageurl, "user_posts")
             filters["imageurl"] = cloud_image_info["cloudinary_url"]
 
-        return models.UserPost.objects.create(**filters)
+        if result.get("accepted", True):
+            return models.UserPost.objects.create(**filters)
+        else:
+            raise serializers.ValidationError("description contains negative emotions which are against the rules of the platform to confess")
 
 
 class UpdatePostSerializer(serializers.Serializer):

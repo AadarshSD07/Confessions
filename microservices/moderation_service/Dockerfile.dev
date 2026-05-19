@@ -1,0 +1,33 @@
+# Use an official Python runtime
+FROM python:3.11-slim AS base
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Install system dependencies (if needed for packages like psycopg2 or cryptography)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy and install Python requirements
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
+
+FROM base AS development
+
+# Install extra tools useful during development (e.g., debuggers)
+RUN pip install --no-cache-dir debugpy
+
+# In development, we use volumes to mount local code, 
+# but copying ensures the container works standalone if needed.
+COPY . .
+
+EXPOSE 8001
+
+# Run the development server
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]

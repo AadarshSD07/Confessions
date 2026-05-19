@@ -1,0 +1,6 @@
+better-profanity==0.7.0
+cachetools==6.2.6
+detoxify==0.5.2
+fastapi==0.128.8
+langdetect==1.0.9
+uvicorn==0.39.0

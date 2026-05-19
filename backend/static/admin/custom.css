@@ -1,0 +1,19 @@
+/* Header background */
+#header {
+    background-color: #1e1e2f;
+}
+
+/* Header text */
+#header h1 a {
+    color: #ffffff;
+}
+
+/* Sidebar */
+.module h2, .module caption {
+    background-color: #3b3b98;
+}
+
+/* Buttons */
+.button.default {
+    background-color: #6c5ce7;
+}

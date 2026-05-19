@@ -47,5 +47,19 @@ services:
     stdin_open: true # Required for some React versions to stay open
     tty: true
 
+  fastapi-dev:
+    build:
+      context: ./microservices/moderation_service
+    container_name: moderation_fastapi
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./microservices/moderation_service:/app
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB} # Shared DB
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   postgres_data:

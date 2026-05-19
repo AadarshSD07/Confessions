@@ -38,7 +38,7 @@ class Config:
     """Project Variables"""
     posts_per_page = os.getenv('POSTS_PER_PAGE', '50')
     default_image = f"{os.getenv('VITE_BACKEND_DOMAIN')}/static/user_profile_images/default-avatar.png"
-    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+    moderation_url = os.getenv("MODERATION_URL")
 
     """Postgres Configuration"""
     postgres_db = os.getenv("POSTGRES_DB")
@@ -47,8 +47,9 @@ class Config:
     postgres_host = os.getenv("POSTGRES_HOST")
     postgres_port = os.getenv("POSTGRES_PORT", 5432)
 
-    """Cloudinary Configuration"""
+    """Third Party Integration"""
     cloudinary_url = os.getenv('CLOUDINARY_URL')
     cloud_name = os.getenv('CLOUD_NAME')
     api_key = os.getenv('API_KEY')
     api_secret = os.getenv('API_SECRET')
+    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
