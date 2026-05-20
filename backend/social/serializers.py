@@ -100,9 +100,12 @@ class CreatePostSerializer(serializers.ModelSerializer):
         """
         Create a new post with the authenticated user
         """
+        accepted = True
         # Confession check before saving
-        response = httpx.post(Config.moderation_url, json={"text": validated_data.get('post_desc')})
-        result = response.json()
+        if Config.moderation_url:
+            response = httpx.post(Config.moderation_url, json={"text": validated_data.get('post_desc')})
+            result = response.json()
+            accepted = result.get("accepted", accepted)
 
         # User is passed via context from the view
         user = self.context['request'].user
@@ -119,7 +122,7 @@ class CreatePostSerializer(serializers.ModelSerializer):
             cloud_image_info = upload_image(imageurl, "user_posts")
             filters["imageurl"] = cloud_image_info["cloudinary_url"]
 
-        if result.get("accepted", True):
+        if accepted:
             return models.UserPost.objects.create(**filters)
         else:
             raise serializers.ValidationError("description contains negative emotions which are against the rules of the platform to confess")
