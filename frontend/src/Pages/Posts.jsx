@@ -27,6 +27,21 @@ const Posts = (props) => {
 
   const deletePost = async (postId) => {
     props.setError(null);
+    const div = document.querySelector(`#div-${postId}`);
+
+    if (div) {
+      div.style.transition = "opacity 0.5s ease";
+      div.style.opacity = "0";
+
+      setTimeout(() => {
+        div.innerHTML = "Confession is deleted";
+        Object.assign(div.style, {
+          opacity: 1,
+          padding: "20px",
+          textAlign: "center"
+        });
+      }, 500);
+    }
 
     try {
       const config = {
@@ -45,6 +60,7 @@ const Posts = (props) => {
       } else {
         updateStatus({status: "danger", message: "Facing error while deleting the post: " + response.status});
       }
+      
     } catch (err) {
       props.setError(err);
     }
