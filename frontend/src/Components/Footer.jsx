@@ -7,7 +7,7 @@ export default function Footer() {
         {/* Left */}
         <div className="footer-brand">
           <h4>Confessions</h4>
-          <p>A full-stack social media platform demo</p>
+          <p>Unfiltered thoughts, absolute anonymity.</p>
         </div>
 
         {/* Center */}
